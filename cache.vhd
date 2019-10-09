@@ -9,28 +9,27 @@ entity cache is
     reset : in std_logic;
     load_flag : in std_logic;
     we : in std_logic;
-    -- program counter is 4-byte aligned
     address : in std_logic_vector(ADDRESS_LENGTH-1 downto 0);
     tag : in std_logic;
-    write_data0 : in std_logic_vector(31 downto 0);
-    write_data1: in std_logic_vector(31 downto 0);
-    write_data2: in std_logic_vector(31 downto 0);
-    write_data3: in std_logic_vector(31 downto 0);
-    write_data4: in std_logic_vector(31 downto 0);
-    write_data5: in std_logic_vector(31 downto 0);
-    write_data6: in std_logic_vector(31 downto 0);
-    write_data7: in std_logic_vector(31 downto 0);
-    write_data8 : in std_logic_vector(31 downto 0);
+    write_data0 : in std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    write_data1: in std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    write_data2: in std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    write_data3: in std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    write_data4: in std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    write_data5: in std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    write_data6: in std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    write_data7: in std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    write_data8 : in std_logic_vector(DATA_BANDWIDTH-1 downto 0);
     read_data_tag_index : out cache_tag_index_vector;
-    read_data : out std_logic_vector(31 downto 0);
-    read_data1: out std_logic_vector(31 downto 0);
-    read_data2: out std_logic_vector(31 downto 0);
-    read_data3: out std_logic_vector(31 downto 0);
-    read_data4: out std_logic_vector(31 downto 0);
-    read_data5: out std_logic_vector(31 downto 0);
-    read_data6: out std_logic_vector(31 downto 0);
-    read_data7: out std_logic_vector(31 downto 0);
-    read_data8 : out std_logic_vector(31 downto 0);
+    read_data : out std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    read_data1: out std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    read_data2: out std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    read_data3: out std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    read_data4: out std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    read_data5: out std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    read_data6: out std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    read_data7: out std_logic_vector(DATA_BANDWIDTH-1 downto 0);
+    read_data8 : out std_logic_vector(DATA_BANDWIDTH-1 downto 0);
     -- push cache miss to the memory
     miss : out std_logic;
     valid_flag : out std_logic;
@@ -42,8 +41,7 @@ end entity;
 
 architecture behavior of cache is
   -- constants
-  constant SIZE : natural := 256; 
-  constant DATA_BLOCK_SIZE : natural := 2**CACHE_OFFSET_SIZE;
+  -- constant SIZE : natural := 256; 
   
   component cache_decoder
     port (
@@ -83,7 +81,7 @@ architecture behavior of cache is
   signal signal_address_tag : cache_tag_vector;
   signal signal_address_index : cache_index_vector;
   signal signal_address_offset : cache_offset_vector;
-
+  -- defining real memory
   signal signal_ram1_datum : std_logic_vector((DATA_BLOCK_SIZE)-1 downto 0);
   signal signal_ram2_datum : std_logic_vector((DATA_BLOCK_SIZE)-1 downto 0);
   signal signal_ram3_datum : std_logic_vector((DATA_BLOCK_SIZE)-1 downto 0);
@@ -109,47 +107,49 @@ begin
   );
   -- read & write data or load block from memory
   process(clk, reset, we, signal_address_tag, signal_valid_datum, signal_address_index, signal_address_offset, write_data1, write_data2, write_data3, write_data4, write_data5, write_data6, write_data7, write_data8, write_data0)
+    -- v_idx 3 bits
     variable v_idx : natural;
-    variable v_valid_data : valid_array_type(0 to SIZE-1);
-    variable v_tag_data : tag_array_type(0 to SIZE-1);
-    variable v_dirty_data : dirty_array_type(0 to SIZE-1);
-    variable v_ram1_data : dummy_ram(0 to SIZE-1);
-    variable v_ram2_data : dummy_ram(0 to SIZE-1);
-    variable v_ram3_data : dummy_ram(0 to SIZE-1);
-    variable v_ram4_data : dummy_ram(0 to SIZE-1);
-    variable v_ram5_data : dummy_ram(0 to SIZE-1);
-    variable v_ram6_data : dummy_ram(0 to SIZE-1);
-    variable v_ram7_data : dummy_ram(0 to SIZE-1);
-    variable v_ram8_data : dummy_ram(0 to SIZE-1);
+    variable v_valid_data : valid_array_type(0 to DATA_BANDWIDTH-1);
+    variable v_tag_data : tag_array_type(0 to DATA_BANDWIDTH-1);
+    variable v_dirty_data : dirty_array_type(0 to DATA_BANDWIDTH-1);
+    variable v_ram1_data : dummy_ram(0 to DATA_BANDWIDTH-1);
+    variable v_ram2_data : dummy_ram(0 to DATA_BANDWIDTH-1);
+    variable v_ram3_data : dummy_ram(0 to DATA_BANDWIDTH-1);
+    variable v_ram4_data : dummy_ram(0 to DATA_BANDWIDTH-1);
+    variable v_ram5_data : dummy_ram(0 to DATA_BANDWIDTH-1);
+    variable v_ram6_data : dummy_ram(0 to DATA_BANDWIDTH-1);
+    variable v_ram7_data : dummy_ram(0 to DATA_BANDWIDTH-1);
+    variable v_ram8_data : dummy_ram(0 to DATA_BANDWIDTH-1);
   begin
---     -- initialization
---     if reset = '1' then
---       -- initialize with zeros
---       v_valid_data := (others => '0');
---     -- writeback
---     elsif rising_edge(clk) then
---       -- pull the notification from the memory
---       if load_data_en = '1' then
---         v_idx := to_integer(unsigned(signal_address_index));
---         -- when the ram_data is initial state
---         v_valid_data(v_idx) := '1';
---         v_dirty_data(v_idx) := '0';
---         v_tag_data(v_idx) := signal_address_tag;
---         v_ram1_data(v_idx) := write_data1;
---         v_ram2_data(v_idx) := write_data2;
---         v_ram3_data(v_idx) := write_data3;
---         v_ram4_data(v_idx) := write_data4;
---         v_ram5_data(v_idx) := write_data5;
---         v_ram6_data(v_idx) := write_data6;
---         v_ram7_data(v_idx) := write_data7;
---         v_ram8_data(v_idx) := write_data8;
---       elsif we = '1' then
---         if signal_valid_datum = '1' then
---           -- cache hit!
---           if signal_tag_datum = signal_address_tag then
---             v_dirty_data(v_idx) := '1';
---             v_idx := to_integer(unsigned(signal_address_index));
+       -- initialization
+       if reset = '1' then
+         -- initialize with zeros
+         v_valid_data := (others => '0');
+       -- writeback
+       elsif rising_edge(clk) then
+       -- pull the notification from the memory
+       if load_data_en = '1' then
+           v_idx := to_integer(unsigned(signal_address_index));
+           -- when the ram_data is initial state
+           v_valid_data(v_idx) := '1';
+           v_dirty_data(v_idx) := '0';
+           v_tag_data(v_idx) := signal_address_tag;
+           v_ram1_data(v_idx) := write_data1;
+           v_ram2_data(v_idx) := write_data2;
+           v_ram3_data(v_idx) := write_data3;
+           v_ram4_data(v_idx) := write_data4;
+           v_ram5_data(v_idx) := write_data5;
+           v_ram6_data(v_idx) := write_data6;
+           v_ram7_data(v_idx) := write_data7;
+           v_ram8_data(v_idx) := write_data8;
+       elsif we = '1' then
+         if signal_valid_datum = '1' then
+           -- cache hit!
+           if signal_tag_datum = signal_address_tag then
+             v_dirty_data(v_idx) := '1';
+             v_idx := to_integer(unsigned(signal_address_index));
 --             case signal_address_offset is
+--              case signal_address_offset is
 --               when "000" =>
 --                 v_ram1_data(v_idx) := write_data0;
 --               when "001" =>
@@ -167,12 +167,12 @@ begin
 --               when "111" =>
 --                 v_ram8_data(v_idx) := write_data0;
 --               when others =>
---                 -- do nothing
+                 -- do nothing
 --             end case;
---           end if;
---         end if;
---       end if;
---     end if;
+          end if;
+         end if;
+       end if;
+       end if;
 -- 
 --     -- read
 --     if not is_X(signal_address_index) then

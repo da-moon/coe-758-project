@@ -1,24 +1,10 @@
 v 4
-file . "cache_decoder_test.vhdl" "7aed3664e774ad7296e16c64859312cbfc48db67" "20191009185338.210":
-  entity cache_decoder_test at 2( 1) + 0 on 24;
-  architecture behavior of cache_decoder_test at 7( 98) + 0 on 25;
-file . "mux8_test.vhdl" "c46f6535a8832fbc135cb66bc6a57a7e4b1ad10b" "20191009185338.209":
-  entity mux8_test at 2( 1) + 0 on 22;
-  architecture behavior of mux8_test at 8( 81) + 0 on 23;
-file . "mux2_test.vhdl" "2536f9f40cf8878e09da8132940cbbda1b688f77" "20191009185338.208":
-  entity mux2_test at 1( 0) + 0 on 20;
-  architecture behavior of mux2_test at 11( 122) + 0 on 21;
-file . "cache_primitives.vhd" "e79f987ffa014ff32c1dea6c5f9a353e5974cddf" "20191009185338.171":
-  package cache_primitives at 1( 0) + 0 on 11;
-file . "mux2.vhd" "8b0f0908986ea89139dee218d34fe4a2d9b6efc5" "20191009185338.178":
-  entity mux2 at 1( 0) + 0 on 12;
-  architecture behavior of mux2 at 13( 275) + 0 on 13;
-file . "mux8.vhd" "3f4fce85a750d6678641725e8b954d6fd2a46694" "20191009185338.180":
-  entity mux8 at 2( 1) + 0 on 14;
-  architecture behavior of mux8 at 19( 590) + 0 on 15;
-file . "cache_decoder.vhd" "8fa457d2f7b6b6ceca8729816e8f41a0c78aed28" "20191009185338.181":
-  entity cache_decoder at 1( 0) + 0 on 16;
-  architecture behavior of cache_decoder at 22( 580) + 0 on 17;
-file . "cache.vhd" "c914ce45a99f759b12545d06f2019392a91fbf11" "20191009185338.187":
-  entity cache at 1( 0) + 0 on 18;
-  architecture behavior of cache at 43( 1540) + 0 on 19;
+file . "cache_decoder_test.vhdl" "7aed3664e774ad7296e16c64859312cbfc48db67" "20191009200635.782":
+  entity cache_decoder_test at 2( 1) + 0 on 15;
+  architecture behavior of cache_decoder_test at 7( 98) + 0 on 16;
+file . "mux8_test.vhdl" "c46f6535a8832fbc135cb66bc6a57a7e4b1ad10b" "20191009200635.781":
+  entity mux8_test at 2( 1) + 0 on 13;
+  architecture behavior of mux8_test at 8( 81) + 0 on 14;
+file . "mux2_test.vhdl" "ac45c940e8d51b70711d0507db07611ca3153d0e" "20191009200635.780":
+  entity mux2_test at 1( 0) + 0 on 11;
+  architecture behavior of mux2_test at 11( 122) + 0 on 12;

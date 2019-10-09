@@ -10,7 +10,7 @@ END mux2_test;
 
 ARCHITECTURE behavior OF mux2_test IS
 	--Constants
-	CONSTANT SIZE : INTEGER := 32;
+	CONSTANT SIZE : INTEGER := 8;
 	CONSTANT period : TIME := 10 ns;
 
 	-- Component Declaration for the Unit Under Test (UUT)
@@ -45,21 +45,21 @@ BEGIN
 		-- Stimulus process
 		stim_proc : PROCESS
 		BEGIN
-			input_0 <= X"00000001";
-			input_1 <= X"00000000";
+			input_0 <= "00000001";
+			input_1 <= "00000000";
             WAIT FOR period;
 			selector <= '0';
 			WAIT FOR period;
-			ASSERT output = X"00000001" REPORT "test faied for selector '0' " SEVERITY note;
+			ASSERT output = "00000001" REPORT "test faied for selector '0' " SEVERITY note;
 			selector <= 'U';
 			WAIT FOR period;
-			ASSERT output = X"00000001" REPORT "test faied for selector 'U' " SEVERITY note;
+			ASSERT output = "00000001" REPORT "test faied for selector 'U' " SEVERITY note;
 			selector <= '-';
 			WAIT FOR period;
-			ASSERT output = X"00000001" REPORT "test faied for selector '-' " SEVERITY note;
+			ASSERT output = "00000001" REPORT "test faied for selector '-' " SEVERITY note;
 			selector <= '1';
 			WAIT FOR period;
-			ASSERT output = X"00000000" REPORT "test faied for selector '1' " SEVERITY note;
+			ASSERT output = "00000000" REPORT "test faied for selector '1' " SEVERITY note;
 			ASSERT false REPORT "Mux2 test were completed" SEVERITY note;
 
 			WAIT;
