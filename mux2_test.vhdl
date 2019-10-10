@@ -1,4 +1,4 @@
-LIBRARY ieee;
+errorLIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 
 ENTITY mux2_test IS
@@ -50,16 +50,16 @@ BEGIN
             WAIT FOR period;
 			selector <= '0';
 			WAIT FOR period;
-			ASSERT output = "00000001" REPORT "test faied for selector '0' " SEVERITY note;
+			ASSERT output = "00000001" REPORT "test faied for selector '0' " SEVERITY error;
 			selector <= 'U';
 			WAIT FOR period;
-			ASSERT output = "00000001" REPORT "test faied for selector 'U' " SEVERITY note;
+			ASSERT output = "00000001" REPORT "test faied for selector 'U' " SEVERITY error;
 			selector <= '-';
 			WAIT FOR period;
-			ASSERT output = "00000001" REPORT "test faied for selector '-' " SEVERITY note;
+			ASSERT output = "00000001" REPORT "test faied for selector '-' " SEVERITY error;
 			selector <= '1';
 			WAIT FOR period;
-			ASSERT output = "00000000" REPORT "test faied for selector '1' " SEVERITY note;
+			ASSERT output = "00000000" REPORT "test faied for selector '1' " SEVERITY error;
 			ASSERT false REPORT "Mux2 test were completed" SEVERITY note;
 
 			WAIT;

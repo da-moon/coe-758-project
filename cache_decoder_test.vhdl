@@ -43,18 +43,18 @@ BEGIN
 		address <= "0000000000000000";
 		-----------------------------------
 		WAIT FOR period;
-		ASSERT tag = "00000000" REPORT "[ERR] tag @ 0000000000000000" SEVERITY note;
-		ASSERT index = "000" REPORT "[ERR] index @ 0000000000000000" SEVERITY note;
-		ASSERT offset = "00000" REPORT "[ERR] offset @ 0000000000000000" SEVERITY note;
+		ASSERT tag = "00000000" REPORT "[ERR] tag @ 0000000000000000" SEVERITY error;
+		ASSERT index = "000" REPORT "[ERR] index @ 0000000000000000" SEVERITY error;
+		ASSERT offset = "00000" REPORT "[ERR] offset @ 0000000000000000" SEVERITY error;
 		WAIT FOR period;
 		-----------------------------------
 		address <= "0010000001000001";
 		WAIT FOR period;		
-		ASSERT tag = "00100000" REPORT "[ERR] tag @ 0010000000000001" SEVERITY note;
-		ASSERT index = "010" REPORT "[ERR] index @ 0010000001000001" SEVERITY note;
-		ASSERT offset = "00001" REPORT "[ERR] offset @ 0010000000000001" SEVERITY note;
+		ASSERT tag = "00100000" REPORT "[ERR] tag @ 0010000000000001" SEVERITY error;
+		ASSERT index = "010" REPORT "[ERR] index @ 0010000001000001" SEVERITY error;
+		ASSERT offset = "00001" REPORT "[ERR] offset @ 0010000000000001" SEVERITY error;
 		WAIT FOR period;
-		ASSERT false REPORT "cache_decoder tests were successfully completed" SEVERITY note;
+		ASSERT false REPORT "[cache_decoder] tests were successfully completed" SEVERITY note;
 		WAIT;
 	END PROCESS;
 

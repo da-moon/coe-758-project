@@ -1,4 +1,4 @@
-LIBRARY ieee;
+errorLIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 
 ENTITY cache_controller_test IS
@@ -58,25 +58,25 @@ BEGIN
 
 		-- address_in <= address_in or x"0001";
 		-- wait until clk'event and clk='1';
-		-- REPORT "cache_controller@2 result" SEVERITY note;
+		-- REPORT "cache_controller@2 result" SEVERITY error;
 		-- address_in <= address_in or x"0011";
-		-- ASSERT sram_address = x"00" REPORT "[ERR]" SEVERITY note;
+		-- ASSERT sram_address = x"00" REPORT "[ERR]" SEVERITY error;
 -- 
 		-- wait until clk'event and clk='1';
-		-- REPORT "cache_controller@3 result" SEVERITY note;
+		-- REPORT "cache_controller@3 result" SEVERITY error;
 		-- address_in <= address_in and x"0010";
-		-- ASSERT sram_address = x"01" REPORT "[ERR]" SEVERITY note;
+		-- ASSERT sram_address = x"01" REPORT "[ERR]" SEVERITY error;
 		-- wait until clk'event and clk='1';
-		-- REPORT "cache_controller@4 result" SEVERITY note;
+		-- REPORT "cache_controller@4 result" SEVERITY error;
 		-- address_in <= address_in and x"0000";
-		-- ASSERT sram_address = x"11" REPORT "[ERR]" SEVERITY note;
+		-- ASSERT sram_address = x"11" REPORT "[ERR]" SEVERITY error;
 		-- wait until clk'event and clk='1';
-		-- REPORT "cache_controller@5 result" SEVERITY note;
+		-- REPORT "cache_controller@5 result" SEVERITY error;
 		-- address_in <= address_in and x"0000";
-		-- ASSERT sram_address = x"10" REPORT "[ERR]" SEVERITY note;
+		-- ASSERT sram_address = x"10" REPORT "[ERR]" SEVERITY error;
 		-- wait until clk'event and clk='1';
 		-- REPORT "cache_controller@6 result" SEVERITY note;
-		-- ASSERT sram_address = x"00" REPORT "[ERR]" SEVERITY note;
+		-- ASSERT sram_address = x"00" REPORT "[ERR]" SEVERITY error;
 		-- wait until clk'event and clk='1';		
 
 		REPORT "[cache_controller] testing sram Cache Input Payload selector ..." SEVERITY note;
@@ -84,23 +84,23 @@ BEGIN
 		load_from_selector<='1';
 		
 		wait until clk'event and clk='1';	
-		REPORT "cache_controller@8 result" SEVERITY note;
-		ASSERT load_from_payload = x"c1" REPORT "[ERR]" SEVERITY note;
+		REPORT "cache_controller@8 result" SEVERITY error;
+		ASSERT load_from_payload = x"c1" REPORT "[ERR]" SEVERITY error;
 		incoming_sdram_controller_payload<=x"d1";
 
 		wait until clk'event and clk='1';		
-		REPORT "cache_controller@9 result" SEVERITY note;
-		ASSERT load_from_payload = x"d2" REPORT "[ERR]" SEVERITY note;
+		REPORT "cache_controller@9 result" SEVERITY error;
+		ASSERT load_from_payload = x"d2" REPORT "[ERR]" SEVERITY error;
 		load_from_selector<='0';
 		incoming_cpu_payload <= x"c2";
 		
 		wait until clk'event and clk='1';		
-		REPORT "cache_controller@10 result" SEVERITY note;
-		ASSERT load_from_payload = x"d1" REPORT "[ERR]" SEVERITY note;
+		REPORT "cache_controller@10 result" SEVERITY error;
+		ASSERT load_from_payload = x"d1" REPORT "[ERR]" SEVERITY error;
 
 		wait until clk'event and clk='1';		
-		REPORT "cache_controller@11 result" SEVERITY note;
-		ASSERT load_from_payload = x"c2" REPORT "[ERR]" SEVERITY note;
+		REPORT "cache_controller@11 result" SEVERITY error;
+		ASSERT load_from_payload = x"c2" REPORT "[ERR]" SEVERITY error;
 
 
 		REPORT "cache_controller tests completed" SEVERITY note;

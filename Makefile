@@ -23,19 +23,27 @@ else
     ERRIGNORE = 2>/dev/null
     SEP=/
 endif
-
+# ENVIRONMENT Setting
+REMOTE_ENV = false
 GHDLC=ghdl
 VCDFILE=out.vcd
 FLAGS=--warn-error --work=work 
 TB_OPTION=--assert-level=error
-
+####
 VHDS=$(addsuffix .vhd, ${MODULES})
 TESTS=$(addsuffix _test, ${MODULES})
 VHDLS=$(addsuffix .vhdl, $(TESTS))
 PACKAGES = cache_primitives.vhd utils.vhd utils_body.vhd
 MODULES= mux2 mux8 cache_decoder cache_controller
-.PHONY: all clean pre-build build
+.PHONY: all dep clean pre-build build
 
+dep:
+	- $(CLEAR)
+ifeq ($(REMOTE_ENV),true)
+	- @echo $(space) ${PWD}
+else
+	- @echo $(space) "false"
+endif
 clean:
 	- $(CLEAR)
 	- $(RM) work-obj93.cf *.o *.vcd
