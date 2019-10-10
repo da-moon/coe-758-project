@@ -9,6 +9,9 @@ PACKAGE cache_primitives IS
     CONSTANT ADDRESS_LENGTH : NATURAL := 16;
 	CONSTANT DATA_BANDWIDTH : NATURAL := 8;
 	CONSTANT DATA_BLOCK_SIZE : natural := 2**CACHE_OFFSET_SIZE;
+	-- leave 2 bits for dirty and valid bits
+	CONSTANT ALIGNED_SIZE : natural := 2; 
+
     -- cache_offset_vector == std_logic_vector(4 DOWNTO 0)
 	SUBTYPE cache_offset_vector IS std_logic_vector(CACHE_OFFSET_SIZE - 1 DOWNTO 0);
     -- cache_index_vector == std_logic_vector(2 DOWNTO 0)

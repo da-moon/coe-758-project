@@ -32,8 +32,8 @@ TB_OPTION=--assert-level=error
 VHDS=$(addsuffix .vhd, ${MODULES})
 TESTS=$(addsuffix _test, ${MODULES})
 VHDLS=$(addsuffix .vhdl, $(TESTS))
-PACKAGES = cache_primitives.vhd
-MODULES= mux2 mux8 cache_decoder 
+PACKAGES = cache_primitives.vhd utils.vhd utils_body.vhd
+MODULES= mux2 mux8 cache_decoder cache_controller
 .PHONY: all clean pre-build build
 
 clean:
@@ -42,15 +42,14 @@ clean:
 
 pre-build: clean
 	- $(CLEAR)
-	- $(GHDLC) -a --std=00 $(FLAGS) ${PACKAGES} $(VHDS) cache.vhd
+	- $(GHDLC) -a --std=00 $(FLAGS) ${PACKAGES} $(VHDS) 
 	- $(GHDLC) -a --std=00 $(FLAGS) $(VHDLS) 
 
 build: pre-build
 	for target in $(TESTS); do \
 			$(GHDLC) -e $(FLAGS) $$target && \
-			$(GHDLC) -r $(FLAGS) $$target; \
+			$(GHDLC) -r $(FLAGS) $$target --stop-time=3us; \
 	done
-
 
 
 

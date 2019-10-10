@@ -1,10 +1,31 @@
 v 4
-file . "cache_decoder_test.vhdl" "7aed3664e774ad7296e16c64859312cbfc48db67" "20191009200635.782":
-  entity cache_decoder_test at 2( 1) + 0 on 15;
-  architecture behavior of cache_decoder_test at 7( 98) + 0 on 16;
-file . "mux8_test.vhdl" "c46f6535a8832fbc135cb66bc6a57a7e4b1ad10b" "20191009200635.781":
-  entity mux8_test at 2( 1) + 0 on 13;
-  architecture behavior of mux8_test at 8( 81) + 0 on 14;
-file . "mux2_test.vhdl" "ac45c940e8d51b70711d0507db07611ca3153d0e" "20191009200635.780":
-  entity mux2_test at 1( 0) + 0 on 11;
-  architecture behavior of mux2_test at 11( 122) + 0 on 12;
+file . "cache_controller_test.vhdl" "a26994e98c194aa10548f6f5f61c17ccc74141c0" "20191010014009.851":
+  entity cache_controller_test at 1( 0) + 0 on 28;
+  architecture behavior of cache_controller_test at 7( 104) + 0 on 29;
+file . "cache_decoder_test.vhdl" "7aed3664e774ad7296e16c64859312cbfc48db67" "20191010014009.846":
+  entity cache_decoder_test at 2( 1) + 0 on 26;
+  architecture behavior of cache_decoder_test at 7( 98) + 0 on 27;
+file . "mux8_test.vhdl" "c46f6535a8832fbc135cb66bc6a57a7e4b1ad10b" "20191010014009.845":
+  entity mux8_test at 2( 1) + 0 on 24;
+  architecture behavior of mux8_test at 8( 81) + 0 on 25;
+file . "mux2_test.vhdl" "ac45c940e8d51b70711d0507db07611ca3153d0e" "20191010014009.841":
+  entity mux2_test at 1( 0) + 0 on 22;
+  architecture behavior of mux2_test at 11( 122) + 0 on 23;
+file . "cache_primitives.vhd" "9855b4338df2ad0ae56a931feb75402cfdac8b3c" "20191010014009.818":
+  package cache_primitives at 1( 0) + 0 on 11;
+file . "utils.vhd" "3bac43ee0f4606838df3db354b216778b14bbda1" "20191010014009.818":
+  package utils at 1( 0) + 0 on 12 body;
+file . "utils_body.vhd" "2dcef6fea3dc698fc794e214b2b0a9f840e86c89" "20191010014009.820":
+  package body utils at 2( 1) + 0 on 13;
+file . "mux2.vhd" "8b0f0908986ea89139dee218d34fe4a2d9b6efc5" "20191010014009.820":
+  entity mux2 at 1( 0) + 0 on 14;
+  architecture behavior of mux2 at 13( 275) + 0 on 15;
+file . "mux8.vhd" "3f4fce85a750d6678641725e8b954d6fd2a46694" "20191010014009.821":
+  entity mux8 at 2( 1) + 0 on 16;
+  architecture behavior of mux8 at 19( 590) + 0 on 17;
+file . "cache_decoder.vhd" "8fa457d2f7b6b6ceca8729816e8f41a0c78aed28" "20191010014009.821":
+  entity cache_decoder at 1( 0) + 0 on 18;
+  architecture behavior of cache_decoder at 22( 580) + 0 on 19;
+file . "cache_controller.vhd" "c7402ccb52a894561a388e82da31716d648c51e2" "20191010014009.822":
+  entity cache_controller at 1( 0) + 0 on 20;
+  architecture behavior of cache_controller at 33( 881) + 0 on 21;
