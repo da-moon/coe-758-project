@@ -26,16 +26,18 @@ endif
 
 MAKEFILE_LIST=Makefile
 CMD_ARGUMENTS ?= $(cmd)
-CONTAINER_RUNNING := $(shell docker inspect -f '{{.State.Running}}' ghdl-ls)
+
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
 
 # ENVIRONMENT Setting
 DOCKER_ENV = true
 DOCKER_IMAGE=ghdl/ext:latest
+DOCKER_IMAGE_EXISTS := $(shell docker images -q ${DOCKER_IMAGE} 2> /dev/null)
+CONTAINER_RUNNING := $(shell docker inspect -f '{{.State.Running}}' ghdl-ls)
 TB_OPTION=--assert-level=error
 ####
-VCDFILE=out.vcd
 FLAGS=--warn-error --work=work
+
 
 VHDS=$(addsuffix .vhd, ${MODULES})
 TESTS=$(addsuffix _test, ${MODULES})
@@ -47,8 +49,10 @@ MODULES= mux2 mux8 cache_decoder cache_controller
 # ghdl -a --std=00 --warn-error --work=work mux2.vhd
 shell:
 ifeq ($(DOCKER_ENV),true)
-    ifneq ($(CONTAINER_RUNNING),true)
+    ifeq ($(DOCKER_IMAGE_EXISTS),)
 	- @docker pull ${DOCKER_IMAGE}
+    endif
+    ifneq ($(CONTAINER_RUNNING),true)
 	- @docker run -v ${CURDIR}:/mnt/project --name ghdl-ls --rm -d -i -t ${DOCKER_IMAGE} /bin/bash -c "/opt/ghdl/install_vsix.sh && tail -f /dev/null"
 	- $(CLEAR)
     endif
