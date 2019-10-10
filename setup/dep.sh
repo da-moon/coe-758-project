@@ -23,4 +23,4 @@ unzip "$vsix_file"
 rm [Content_Types].xml
 mv extension.vsixmanifest extension/.vsixmanifest
 mv extension "$vsc_exts/tgingold.${vsix_file%.*}"
-cd ..  && sudo rm -rf libghdl-py && sudo rm -rf ghdl-ls sudo rm -rf ghdl-language-server  
+cd ..  && rm -rf libghdl-py && rm -rf ghdl-ls && rm -rf ghdl-language-server  
