@@ -1,5 +1,13 @@
 # Project-1
 
+## Overview
+
+- install docker
+- to build the project and run tests , run the following in terminal 
+  ```bash
+    make -j$(nproc) build
+  ```
+
 ## mux2 left [temp]
 
  
