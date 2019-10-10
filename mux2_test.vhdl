@@ -1,4 +1,4 @@
-errorLIBRARY ieee;
+LIBRARY ieee;
 USE ieee.std_logic_1164.ALL;
 
 ENTITY mux2_test IS

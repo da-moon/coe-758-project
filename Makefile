@@ -23,51 +23,57 @@ else
     ERRIGNORE = 2>/dev/null
     SEP=/
 endif
-# ENVIRONMENT Setting
-REMOTE_ENV = false
-DOCKER_IMAGE=ghdl/ext:latest
-ifeq ($(REMOTE_ENV),true)
-    GHDLC = ghdl
-else
-    GHDLC = ghdl
-endif
 
-FLAGS=--warn-error --work=work 
+MAKEFILE_LIST=Makefile
+CMD_ARGUMENTS ?= $(cmd)
+CONTAINER_RUNNING := $(shell docker inspect -f '{{.State.Running}}' ghdl-ls)
+THIS_FILE := $(lastword $(MAKEFILE_LIST))
+
+# ENVIRONMENT Setting
+DOCKER_ENV = true
+DOCKER_IMAGE=ghdl/ext:latest
 TB_OPTION=--assert-level=error
 ####
+VCDFILE=out.vcd
+FLAGS=--warn-error --work=work
+
 VHDS=$(addsuffix .vhd, ${MODULES})
 TESTS=$(addsuffix _test, ${MODULES})
 VHDLS=$(addsuffix .vhdl, $(TESTS))
 PACKAGES = cache_primitives.vhd utils.vhd utils_body.vhd
 MODULES= mux2 mux8 cache_decoder cache_controller
-.PHONY: all test dep clean pre-build build
-
-dep:
+.PHONY: all shell clean pre-build build
+# ex : make cmd="ghdl -a --std=00 --warn-error --work=work  mux2.vhd"
+# ghdl -a --std=00 --warn-error --work=work mux2.vhd
+shell:
+ifeq ($(DOCKER_ENV),true)
+    ifneq ($(CONTAINER_RUNNING),true)
+	- @docker pull ${DOCKER_IMAGE}
+	- @docker run -v ${CURDIR}:/mnt/project --name ghdl-ls --rm -d -i -t ${DOCKER_IMAGE} /bin/bash -c "/opt/ghdl/install_vsix.sh && tail -f /dev/null"
 	- $(CLEAR)
-ifeq ($(REMOTE_ENV),true)
-	- sudo apt update
-	- sudo apt install -y ghdl
-	- /bin/bash -c "./setup/dep.sh"
-else
-	- docker pull ${DOCKER_IMAGE}
-	- docker run --name ghdl-ls -i ghdl/ext:latest bash -c "/opt/ghdl/install_vsix.sh"
+    endif
 endif
+ifneq ($(CMD_ARGUMENTS),)
+    ifeq ($(DOCKER_ENV),true)
+	- @docker exec --workdir /mnt/project ghdl-ls /bin/bash -c "$(CMD_ARGUMENTS)"
+    else
+	- @/bin/bash -c "$(CMD_ARGUMENTS)"
+    endif
+endif
+
 clean:
 	- $(CLEAR)
 	- $(RM) work-obj93.cf *.o *.vcd
 
 pre-build: clean
 	- $(CLEAR)
-	- $(GHDLC) -a --std=00 $(FLAGS) ${PACKAGES} $(VHDS) 
-	- $(GHDLC) -a --std=00 $(FLAGS) $(VHDLS) 
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --std=00 $(FLAGS) ${PACKAGES} $(VHDS)"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --std=00 $(FLAGS) $(VHDLS)"
 
 build: pre-build
+	- $(CLEAR)
 	for target in $(TESTS); do \
-			$(GHDLC) -e $(FLAGS) $$target && \
-			$(GHDLC) -r $(FLAGS) $$target --stop-time=3us; \
+ 			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -e $(FLAGS) $$target" && \
+			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r $(FLAGS) $$target --stop-time=3us"; \
 	done
-
-
-test: 
-	- $(CLEAR)
-	- $(CLEAR)
+    
