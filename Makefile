@@ -33,11 +33,13 @@ THIS_FILE := $(lastword $(MAKEFILE_LIST))
 DOCKER_ENV = true
 DOCKER_IMAGE=ghdl/ext:latest
 DOCKER_IMAGE_EXISTS := $(shell docker images -q ${DOCKER_IMAGE} 2> /dev/null)
-CONTAINER_RUNNING := $(shell docker inspect -f '{{.State.Running}}' ghdl-ls)
+DOCKER_CONTAINER_MOUNT_POINT=/mnt/project
+DOCKER_CONTAINER_NAME=ghdl-ls
+
+CONTAINER_RUNNING := $(shell docker inspect -f '{{.State.Running}}' ${DOCKER_CONTAINER_NAME})
 TB_OPTION=--assert-level=error
 ####
 FLAGS=--warn-error --work=work
-
 
 VHDS=$(addsuffix .vhd, ${MODULES})
 TESTS=$(addsuffix _test, ${MODULES})
@@ -53,14 +55,16 @@ ifeq ($(DOCKER_ENV),true)
 	- @docker pull ${DOCKER_IMAGE}
     endif
     ifneq ($(CONTAINER_RUNNING),true)
-	- @docker run -v ${CURDIR}:/mnt/project --name ghdl-ls --rm -d -i -t ${DOCKER_IMAGE} /bin/bash -c "/opt/ghdl/install_vsix.sh && tail -f /dev/null"
+	- @docker run -v ${CURDIR}:${DOCKER_CONTAINER_MOUNT_POINT} --name ${DOCKER_CONTAINER_NAME} --rm -d -i -t ${DOCKER_IMAGE} /bin/bash -c "/opt/ghdl/install_vsix.sh && tail -f /dev/null"
 	- $(CLEAR)
     endif
 endif
 ifneq ($(CMD_ARGUMENTS),)
     ifeq ($(DOCKER_ENV),true)
-	- @docker exec --workdir /mnt/project ghdl-ls /bin/bash -c "$(CMD_ARGUMENTS)"
+	- @echo Running in Docker Container
+	- @docker exec --workdir ${DOCKER_CONTAINER_MOUNT_POINT} ${DOCKER_CONTAINER_NAME} /bin/bash -c "$(CMD_ARGUMENTS)"
     else
+	- @echo Running in local environment
 	- @/bin/bash -c "$(CMD_ARGUMENTS)"
     endif
 endif
