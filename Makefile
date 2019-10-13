@@ -28,6 +28,13 @@ else
     SEP=/
 endif
 
+# ifeq (args,$(firstword $(MAKECMDGOALS)))
+  # use the rest as arguments
+  RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+  # ...and turn them into do-nothing targets
+  $(eval $(RUN_ARGS):;@:)
+# endif
+
 # Recursive wildcard 
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
 MAKEFILE_LIST=Makefile
@@ -39,12 +46,11 @@ CMD_ARGUMENTS ?= $(cmd)
 TB_OPTION=--assert-level=error
 ####
 FLAGS=--warn-error --work=work
-VHDS=$(addsuffix .vhd, ${MODULES})
-TESTS=$(addsuffix _test, ${MODULES})
-VHDLS=$(addsuffix .vhdl, $(TESTS))
-PACKAGES = cache_primitives.vhd 
-MODULES= mux2 
-
+PACKAGES = $(patsubst %.vhd,%, $(call rwildcard,./,*_pkg.vhd)) $(patsubst %.vhd,%, $(call rwildcard,./,*_pkg_body.vhd)) 
+MODULES?= $(filter-out  $(PACKAGES),$(patsubst %.vhd,%, $(call rwildcard,./,*.vhd)) )
+TEMP ?= 
+ANALYZE_TARGETS=$(addsuffix .vhd, ${MODULES}) $(addsuffix _behaviour.vhdl, ${MODULES}) $(addsuffix .vhd, ${PACKAGES}) 
+TESTS=$(addsuffix _tb.vhdl, ${MODULES})
 ifeq ($(DOCKER_ENV),true)
     ifeq ($(shell ${WHICH} docker 2>${DEVNUL}),)
         $(error "docker is not in your system PATH. Please install docker to continue or set DOCKER_ENV = false in make file ")
@@ -64,10 +70,10 @@ else
     endif
 endif
 
-# Mermaid Files
-# MERMAID_FILES?=$(patsubst %.mmd,%,$(subst mermaid/,, $(call rwildcard,mermaid/,*.mmd)))
 
-.PHONY: all dep shell clean mermaid 
+.PHONY: all shell clean build analyze module
+.SILENT: all shell clean build analyze module
+
 # ex : make cmd="ls -lah"
 shell:
 ifneq ($(DOCKER_ENV),)
@@ -81,43 +87,61 @@ ifeq ($(DOCKER_ENV),true)
     endif
 endif
 endif
-	# - $(CLEAR)
 ifneq ($(CMD_ARGUMENTS),)
     ifeq ($(DOCKER_ENV),true)
         ifneq ($(DOCKER_ENV),)
-	- $(info Running in Docker Container)
 	- @docker exec  --workdir ${DOCKER_CONTAINER_MOUNT_POINT} ${DOCKER_CONTAINER_NAME} /bin/bash -c "$(CMD_ARGUMENTS)"
         endif
     else
-	- $(info Running in local environment)
 	- @/bin/bash -c "$(CMD_ARGUMENTS)"
     endif
 endif
 
+
+# test: 
+# 	- $(CLEAR) 
+# 	- @echo$(SPACE)  $(ANALYZE_TARGETS)
+# 	- @echo$(SPACE) 
+
+analyze: clean
+	- $(RM) test_results
+	- $(MKDIR) test_results
+    ifeq ($(DOCKER_ENV),true)
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(TESTS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
+    else
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS)"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(TESTS)"
+    endif
+
+module : 
+	- $(CLEAR) 
+	- $(TOUCH) $(addsuffix .vhd,$(RUN_ARGS))
+	- $(TOUCH) $(addsuffix _tb.vhdl,$(RUN_ARGS))
+	- $(TOUCH) $(addsuffix _behaviour.vhdl,$(RUN_ARGS))
+
+build:  analyze
+	- $(CLEAR)
+    ifeq ($(DOCKER_ENV),true)
+	- $(info Building in Docker Container)
+	for target in $(subst ./,, $(addsuffix _tb, ${MODULES})); do \
+			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -e --ieee=synopsys $(FLAGS) $$target" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project" && \
+			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r --ieee=synopsys  $(FLAGS) $$target --stop-time=3us" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"; \
+	done
+    else
+	- $(info Building in local environment)
+	for target in $(subst ./,, $(addsuffix _tb, ${MODULES})); do \
+			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -e --ieee=synopsys $(FLAGS) $$target" && \
+			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r --ieee=synopsys $(FLAGS) $$target --stop-time=3us"; \
+	done
+    endif
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) clean
+
+
 clean:
-	# - $(CLEAR)
-	- $(RM) work-obj93.cf *.o *.vcd
-
-pre-build: clean
-	# - $(CLEAR)
     ifeq ($(DOCKER_ENV),true)
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --std=00 $(FLAGS) ${PACKAGES} $(VHDS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --std=00 $(FLAGS) $(VHDLS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl --clean --workdir=./" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
     else
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --std=00 $(FLAGS) ${PACKAGES} $(VHDS)"
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --std=00 $(FLAGS) $(VHDLS)"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl --clean --workdir=./"
     endif
-
-build:  pre-build
-	# - $(CLEAR)
-    ifeq ($(DOCKER_ENV),true)
-	for target in $(TESTS); do \
-			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -e $(FLAGS) $$target" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project" && \
-			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r $(FLAGS) $$target --stop-time=3us" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"; \
-	done
-    else
-	for target in $(TESTS); do \
-			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -e $(FLAGS) $$target" && \
-			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r $(FLAGS) $$target --stop-time=3us"; \
-	done
-    endif
+	- $(RM) work-obj93.cf *.o

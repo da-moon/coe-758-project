@@ -1,0 +1,294 @@
+TRIG :  0
+CPU cs :  0
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0110011000000110
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0001000100000000
+CPU Data OUT : 10101010
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0001000100000010
+CPU Data OUT : 10111011
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0001000100000000
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0001000100000010
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0011001101000110
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0100010001000100
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0101010100000100
+CPU Data OUT : 11001100
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0110011000000110
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0001000100000000
+CPU Data OUT : 10101010
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0001000100000010
+CPU Data OUT : 10111011
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0001000100000000
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0001000100000010
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0011001101000110
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0100010001000100
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0101010100000100
+CPU Data OUT : 11001100
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0110011000000110
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0001000100000000
+CPU Data OUT : 10101010
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0001000100000010
+CPU Data OUT : 10111011
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0001000100000000
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0001000100000010
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0011001101000110
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0100010001000100
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0101010100000100
+CPU Data OUT : 11001100
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0110011000000110
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0001000100000000
+CPU Data OUT : 10101010
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0001000100000010
+CPU Data OUT : 10111011
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0001000100000000
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0001000100000010
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0011001101000110
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0100010001000100
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0101010100000100
+CPU Data OUT : 11001100
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0110011000000110
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0001000100000000
+CPU Data OUT : 10101010
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0001000100000010
+CPU Data OUT : 10111011
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0001000100000000
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0001000100000010
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0011001101000110
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0100010001000100
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0101010100000100
+CPU Data OUT : 11001100
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0110011000000110
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0001000100000000
+CPU Data OUT : 10101010
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0001000100000010
+CPU Data OUT : 10111011
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0001000100000000
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0001000100000010
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0011001101000110
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0100010001000100
+CPU Data OUT : 00000000
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  1
+CPU OUT ADDRESS : 0101010100000100
+CPU Data OUT : 11001100
+-------------
+TRIG :  0
+CPU cs :  1
+CPU wr_rd :  0
+CPU OUT ADDRESS : 0110011000000110
+CPU Data OUT : 00000000
+-------------
