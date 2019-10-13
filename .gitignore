@@ -1,3 +1,4 @@
 work-obj93.cf 
 *.o 
 *.vcd
+test_results
