@@ -1,0 +1,40 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.ALL;
+use work.cache_pkg.ALL;
+ENTITY cache_controller IS
+generic (
+        --    write_strategy : strategy_type;  --  write_through or copy_back
+           Tpd_clk_out : Time;		  -- clock to output propagation delay
+           tag : string := "";
+		   origin_x, origin_y : real := 0.0
+		);
+  port (
+	clk 		: in  STD_LOGIC;
+	rst 		: in  STD_LOGIC;
+	-- phi1, phi2 : in bit;		  -- 2-phase non-overlapping clocks
+	-- reset : in bit;			  -- synchronous reset input
+    --     --  connections to CPU
+	-- cpu_enable : in bit;		  -- starts memory cycle
+	-- cpu_width : in mem_width;	  -- byte/halfword/word indicator
+	-- cpu_write : in bit;		  -- selects read or write cycle
+	-- cpu_ready : out bit;		  -- status from memory system
+	-- cpu_a : in dlx_address;		  -- address bus output
+	-- cpu_d : inout dlx_word_bus bus;	  -- bidirectional data bus
+        --  connections to memory
+	-- starts memory cycle
+	mem_enable : out bit;		 
+	 -- byte/halfword/word indicator
+	mem_width : out mem_width;	 
+	 -- selects read or write cycle
+	mem_write : out bit;		 
+	 --  tell memory to burst txfer
+	mem_burst : out bit;             
+	-- status from memory system
+	mem_ready : in bit;	
+	-- address bus output	  
+	mem_a : out dlx_address;	 
+	-- bidirectional data bus
+	mem_d : inout dlx_word_bus bus
+	);  
+
+END cache_controller;

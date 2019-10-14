@@ -1,0 +1,6 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use std.textio.all;
+
+entity cache_controller_tb is
+end cache_controller_tb;

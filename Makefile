@@ -49,7 +49,7 @@ FLAGS=--warn-error --work=work
 PACKAGES = $(patsubst %.vhd,%, $(call rwildcard,./,*_pkg.vhd)) $(patsubst %.vhd,%, $(call rwildcard,./,*_pkg_body.vhd)) 
 MODULES?= $(filter-out  $(PACKAGES),$(patsubst %.vhd,%, $(call rwildcard,./,*.vhd)) )
 TEMP ?= 
-ANALYZE_TARGETS=$(addsuffix .vhd, ${MODULES}) $(addsuffix _behaviour.vhdl, ${MODULES}) $(addsuffix .vhd, ${PACKAGES}) 
+ANALYZE_TARGETS=$(addsuffix .vhd, ${PACKAGES})$(SPACE) $(addsuffix .vhd, ${MODULES})$(SPACE) $(addsuffix _behaviour.vhdl, ${MODULES}) 
 TESTS=$(addsuffix _tb.vhdl, ${MODULES})
 ifeq ($(DOCKER_ENV),true)
     ifeq ($(shell ${WHICH} docker 2>${DEVNUL}),)
@@ -100,7 +100,7 @@ endif
 
 # test: 
 # 	- $(CLEAR) 
-# 	- @echo$(SPACE)  $(ANALYZE_TARGETS)
+# 	- @echo$(SPACE)  ${PACKAGES}
 # 	- @echo$(SPACE) 
 
 analyze: clean

@@ -22,12 +22,21 @@ package body utils_pkg is
           end loop;
       return b;
     end TO_STRING; 
-    -- function IMAGE(L: std_logic) return String is
-    --   variable bit_image: String(1 to 1) ;
-    --   begin
-    --   bit_image(1) :=std_logic'image(L);
-    --   return bit_image;
-    --   end function IMAGE;
+
+    function TO_I(ARG: in STD_LOGIC_VECTOR) return NATURAL IS     
+    begin     
+      return TO_INTEGER(UNSIGNED(ARG));    
+    end TO_I; 
+    
+    function TO_SLV(ARG: in UNSIGNED) return STD_LOGIC_VECTOR IS     
+    begin     
+      return STD_LOGIC_VECTOR(ARG);    
+    end TO_SLV;
+    
+    function TO_SLV(ARG: in SIGNED) return STD_LOGIC_VECTOR IS     
+    begin     
+      return STD_LOGIC_VECTOR(ARG);    
+    end TO_SLV;   
       
       
 end utils_pkg;

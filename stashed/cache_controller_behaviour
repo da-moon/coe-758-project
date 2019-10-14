@@ -1,0 +1,18 @@
+ARCHITECTURE behaviour OF cache_controller
+	IS
+BEGIN
+	
+	process(clk, rst)
+	-- Variable decleration
+    variable store : store_array;
+    variable    cpu_address      : natural;
+    variable    word_offset      : word_offset_range;
+    variable    set_index        : set_index_range;
+    variable    cpu_tag          : natural;
+    variable    entry_index      : entry_index_range;
+    variable    hit              : boolean;
+    variable    next_replacement_entry_index : entry_index_range := 0;
+	begin
+		
+	end process;
+END behaviour;
