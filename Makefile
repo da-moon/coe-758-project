@@ -46,7 +46,10 @@ CMD_ARGUMENTS ?= $(cmd)
 TB_OPTION=--assert-level=error
 ####
 FLAGS=--warn-error --work=work
-PACKAGES = $(patsubst %.vhd,%, $(call rwildcard,./,*_pkg.vhd)) $(patsubst %.vhd,%, $(call rwildcard,./,*_pkg_body.vhd)) 
+
+# PACKAGES = $(filter-out  cache_files_generator,$(patsubst %.vhd,%, $(call rwildcard,./,*_pkg.vhd)) $(patsubst %.vhd,%, $(call rwildcard,./,*_pkg_body.vhd))  )
+PACKAGES = $(patsubst %.vhd,%, $(call rwildcard,./,*_pkg.vhd)) $(patsubst %.vhd,%, $(call rwildcard,./,*_pkg_body.vhd))
+
 MODULES?= $(filter-out  $(PACKAGES),$(patsubst %.vhd,%, $(call rwildcard,./,*.vhd)) )
 TEMP ?= 
 ANALYZE_TARGETS=$(addsuffix .vhd, ${PACKAGES})$(SPACE) $(addsuffix .vhd, ${MODULES})$(SPACE) $(addsuffix _behaviour.vhdl, ${MODULES}) 
@@ -71,8 +74,8 @@ else
 endif
 
 
-.PHONY: all shell clean build analyze module
-.SILENT: all shell clean build analyze module
+.PHONY: all shell clean build analyze module cache_files
+.SILENT: all shell clean build analyze module cache_files
 
 # ex : make cmd="ls -lah"
 shell:
@@ -102,18 +105,22 @@ endif
 # 	- $(CLEAR) 
 # 	- @echo$(SPACE)  ${PACKAGES}
 # 	- @echo$(SPACE) 
-
 analyze: clean
 	- $(RM) test_results
 	- $(MKDIR) test_results
     ifeq ($(DOCKER_ENV),true)
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS) " docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(TESTS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
     else
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS)"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS) "
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(TESTS)"
     endif
-
+	# - ghdl  -r -g -O3 --ieee=synopsys cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data
+#   ifeq ($(DOCKER_ENV),true)
+# 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r -g -O3 --ieee=synopsys cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
+#     else
+# 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl  -r -g -O3 --ieee=synopsys cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data"
+#     endif
 module : 
 	- $(CLEAR) 
 	- $(TOUCH) $(addsuffix .vhd,$(RUN_ARGS))

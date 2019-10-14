@@ -5,7 +5,7 @@ use std.textio.all;
 entity clock_gen_tb is
 end clock_gen_tb;
 
-architecture bench of clock_gen_tb is
+architecture testbench of clock_gen_tb is
 
    constant C_FILE_NAME :string  := "DataOut.dat";
    constant C_DATA1_W   :integer := 16;
@@ -51,4 +51,4 @@ begin
    wait;
 end process;
 
-end bench;
+end testbench;

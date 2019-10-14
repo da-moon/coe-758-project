@@ -7,7 +7,7 @@ use work.utils_pkg.ALL;
 entity cpu_gen_tb is
 end cpu_gen_tb;
 
-architecture bench of cpu_gen_tb is
+architecture testbench of cpu_gen_tb is
   -- constants ... 
    CONSTANT clock_period : TIME := 10 ns;
    CONSTANT TEST_TIME : TIME := 2000 ns;
@@ -82,8 +82,8 @@ stim_proc: process
 
 begin
   WAIT for 1 ns;
-  write(L, string'("cpu_gen tests ... :"));
-  writeline(output, L);
+  -- write(L, string'("cpu_gen tests ... :"));
+  -- writeline(output, L);
   rst <= '1', '0' after 100 ns;
   counter := 0;
 -- 
@@ -123,4 +123,4 @@ begin
   file_close(fptr);
   wait;
 end process;
-end bench;
+end testbench;

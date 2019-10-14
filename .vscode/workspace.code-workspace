@@ -1,0 +1,28 @@
+{
+	"folders": [
+		{
+			"path": "/home/damoonazarpazhooh/go/src/github.com/damoonazarpazhooh/coe-758-project"
+		},
+		{
+			"path": "/home/damoonazarpazhooh/go/src/github.com/damoonazarpazhooh/AdvancedSystemOnChipDesign"
+		},
+		{
+			"path": "/home/damoonazarpazhooh/go/src/github.com/damoonazarpazhooh/758_temp"
+		}
+	],
+	"settings": {
+		"emeraldwalk.runonsave": {
+			"commands": [
+		
+				{
+					"match": "\\.vhd$",
+					"cmd": "make analyze"
+				},
+				{
+					"match": "\\.vhdl$",
+					"cmd": "make analyze"
+				}
+			]
+		}
+	}
+}

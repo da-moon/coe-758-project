@@ -1,6 +1,6 @@
 use std.textio.all;
 
-architecture bench of tb is
+architecture testbench of tb is
 begin
   process
     -- variable decleration
@@ -17,4 +17,4 @@ begin
     wait;
   end process;
 
-end bench;
+end testbench;

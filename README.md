@@ -8,6 +8,11 @@
     make -j$(nproc) build
   ```
 
+## states 
+
+- Valid bit is 0 => CACHE `MISS` => Cache is updated with the new dataset 
+-  
+
 ## mux2 left [temp]
 
  

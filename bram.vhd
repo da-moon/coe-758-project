@@ -10,6 +10,7 @@ entity bram is
       ADDR     : integer  := 10;
       DATA     : integer  := 32;
       EDGE     : EdgeType := RISING;
+      MODE     : MODEType := NO_CHANGE;
       RamFileName     : string 
   );
   port (

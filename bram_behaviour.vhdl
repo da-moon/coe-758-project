@@ -21,24 +21,58 @@ END InitRamFromFile;
 SIGNAL mem : MemType := InitRamFromFile(RamFileName);
 SIGNAL do : STD_LOGIC_VECTOR(DATA - 1 DOWNTO 0) := (OTHERS => '0');
 BEGIN
-PROCESS (clk)
-BEGIN
-    IF EDGE = RISING THEN
-        IF we = '1' THEN
-            mem(to_i(adr)) <= din;
-        ELSE
-            do <= mem(to_i(adr));
-        END IF;
-    ELSE
-        IF we = '1' THEN
-            mem(to_i(adr)) <= din;
-        ELSE
-            do <= mem(to_i(adr));
-        END IF;
-    END IF;
-END PROCESS;
-
+process (clk)
+begin
+  if EDGE = RISING then
+    case MODE is
+      when READ_FIRST => if rising_edge(clk) then
+                           do <= mem(to_i(adr));
+                           if we = '1' then
+                             mem(to_i(adr)) <= din;
+                           end if;
+                         end if;
+      when WRITE_FIRST=> if rising_edge(clk) then
+                           if we = '1' then
+                             mem(to_i(adr)) <= din;
+                             do <= din;
+                           else
+                             do <= mem(to_i(adr));
+                          end if;
+                        end if;
+     when NO_CHANGE  => if rising_edge(clk) then
+                           if we = '1' then
+                             mem(to_i(adr)) <= din;
+                           else
+                             do <= mem(to_i(adr));
+                          end if;
+                        end if;
+    end case;
+  else
+    case MODE is
+      when READ_FIRST => if falling_edge(clk) then
+                           do <= mem(to_i(adr));
+                           if we = '1' then
+                             mem(to_i(adr)) <= din;
+                           end if;
+                         end if;
+      when WRITE_FIRST=> if falling_edge(clk) then
+                           if we = '1' then
+                             mem(to_i(adr)) <= din;
+                             do <= din;
+                           else
+                             do <= mem(to_i(adr));
+                          end if;
+                        end if;
+     when NO_CHANGE  => if falling_edge(clk) then
+                           if we = '1' then
+                             mem(to_i(adr)) <= din;
+                           else
+                             do <= mem(to_i(adr));
+                          end if;
+                        end if;
+    end case;
+  end if;
+end process;
 --do <= mem(to_i(adr));
 dout <= do;
-
 END behaviour;

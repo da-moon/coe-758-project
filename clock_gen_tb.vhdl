@@ -5,7 +5,7 @@ use std.textio.all;
 entity clock_gen_tb is
 end clock_gen_tb;
 
-architecture bench of clock_gen_tb is
+architecture testbench of clock_gen_tb is
    CONSTANT TEST_TIME : TIME := 2000 ns;
    signal clk           :std_logic := '0';
    signal rst           :std_logic := '0';
@@ -31,8 +31,8 @@ stim_proc: process
    variable counter     :integer;
 begin
    WAIT for 1 ns;
-   write(L, string'("Clock Gen Tests ... :"));
-   writeline(output, L);
+   -- write(L, string'("Clock Gen Tests ... :"));
+   -- writeline(output, L);
    rst <= '1', '0' after 100 ns;
    counter := 0;
    wait until rst = '0';
@@ -48,4 +48,4 @@ begin
    writeline(output, L);
    wait;
 end process;
-end bench;
+end testbench;

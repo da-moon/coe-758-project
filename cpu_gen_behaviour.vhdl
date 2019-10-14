@@ -24,7 +24,6 @@ begin
 			end if;
 		end if;
 	end process;
-	
 	-- Next state generation.
 	process(st1, trig_r)
 	begin

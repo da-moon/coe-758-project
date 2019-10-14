@@ -80,5 +80,20 @@ package body utils_pkg is
  begin
     return TO_HEX_STRING(std_logic_vector(slv));
  end function TO_HEX_STRING;
-      
+ function CEIL_LOG_2(ARG : in INTEGER) return INTEGER IS
+ begin
+   return INTEGER(CEIL(LOG2(REAL(ARG))));
+ end CEIL_LOG_2;
+ 	-- -----------------------------------------------------------------------------------------------------------
+  function RETURN_MODIFIED_VECTOR(
+    index_in : in INTEGER; 
+    vector : in STD_LOGIC_VECTOR; 
+    value_in : in STD_LOGIC
+    ) return STD_LOGIC_VECTOR is
+  variable v : STD_LOGIC_VECTOR(vector'RANGE) := (others=>'0');
+  begin
+    v := vector;
+    v(index_in) := value_in;
+    return v;
+  end RETURN_MODIFIED_VECTOR;     
 end utils_pkg;

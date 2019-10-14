@@ -9,7 +9,7 @@ use work.cache_pkg.ALL;
 entity bram_tb is
 end bram_tb;
 
-architecture bench of bram_tb is
+architecture testbench of bram_tb is
   -- constants ... 
    CONSTANT clock_period : TIME := 10 ns;
    CONSTANT TEST_TIME : TIME := 2000 ns;
@@ -32,6 +32,7 @@ architecture bench of bram_tb is
             ADDR     : integer ;
             DATA     : integer  ;
             EDGE     : EdgeType ;
+            MODE     : MODEType := NO_CHANGE;
             RamFileName     : string  
           );
      PORT (
@@ -87,8 +88,8 @@ stim_proc: process
   variable temp     :STD_LOGIC_VECTOR (1 to 1);
 begin
   WAIT for 1 ns;
-  write(L, string'("bram(file backend) tests ... :"));
-  writeline(output, L);
+  -- write(L, string'("bram(file backend) tests ... :"));
+  -- writeline(output, L);
   rst <= '1', '0' after 100 ns;
   counter := 0;
 -- 
@@ -131,7 +132,7 @@ begin
   end loop;
   wait until rising_edge(clk);
   eof       <= '1';
-  file_close(fptr);
+   file_close(fptr);
   wait;
 end process;
-end bench;
+end testbench;
