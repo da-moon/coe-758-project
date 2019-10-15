@@ -1,106 +1,110 @@
-package body utils_pkg is
-    function MAX (LEFT, RIGHT: INTEGER) return INTEGER is
-    begin
-      if LEFT > RIGHT then return LEFT;
-      else return RIGHT;
-      end if;
-    end MAX;
+PACKAGE BODY utils_pkg IS
+  FUNCTION MAX (LEFT, RIGHT : INTEGER) RETURN INTEGER IS
+  BEGIN
+    IF LEFT > RIGHT THEN
+      RETURN LEFT;
+    ELSE
+      RETURN RIGHT;
+    END IF;
+  END MAX;
 
-    function MIN (LEFT, RIGHT: INTEGER) return INTEGER is
-    begin
-      if LEFT < RIGHT then return LEFT;
-      else return RIGHT;
-      end if;
-    end MIN;
-    function TO_STRING ( a: std_logic_vector) return string is
-      variable b : string (1 to a'length) := (others => NUL);
-      variable stri : integer := 1; 
-      begin
-          for i in a'range loop
-              b(stri) := std_logic'image(a((i)))(2);
-          stri := stri+1;
-          end loop;
-      return b;
-    end TO_STRING; 
-    function TO_I(ARG: in STD_LOGIC_VECTOR) return NATURAL IS     
-    begin     
-      return TO_INTEGER(UNSIGNED(ARG));    
-    end TO_I; 
-    
-    function TO_SLV(ARG: in UNSIGNED) return STD_LOGIC_VECTOR IS     
-    begin     
-      return STD_LOGIC_VECTOR(ARG);    
-    end TO_SLV;
-    
-    function TO_SLV(ARG: in SIGNED) return STD_LOGIC_VECTOR IS     
-    begin     
-      return STD_LOGIC_VECTOR(ARG);    
-    end TO_SLV;   
-       -- converts a std_logic_vector into a hex string.
-   function TO_HEX_STRING(slv: std_logic_vector) return string is
-    variable hexlen: integer;
-    variable longslv : std_logic_vector(67 downto 0):=(others => '0');
-    variable hex : string(1 to 16);
-    variable fourbit : std_logic_vector(3 downto 0);
- begin
-    hexlen:=(slv'left+1)/4;
-    if (slv'left+1) mod 4/=0 then
-       hexlen := hexlen + 1;
-    end if;
-    longslv(slv'left downto 0) := slv;
-    for i in (hexlen-1) downto 0 loop
-        fourbit:=longslv(((i*4)+3) downto (i*4));
-        case fourbit is
-             when "0000" => hex(hexlen-I):='0';
-             when "0001" => hex(hexlen-I):='1';
-             when "0010" => hex(hexlen-I):='2';
-             when "0011" => hex(hexlen-I):='3';
-             when "0100" => hex(hexlen-I):='4';
-             when "0101" => hex(hexlen-I):='5';
-             when "0110" => hex(hexlen-I):='6';
-             when "0111" => hex(hexlen-I):='7';
-             when "1000" => hex(hexlen-I):='8';
-             when "1001" => hex(hexlen-I):='9';
-             when "1010" => hex(hexlen-I):='A';
-             when "1011" => hex(hexlen-I):='B';
-             when "1100" => hex(hexlen-I):='C';
-             when "1101" => hex(hexlen-I):='D';
-             when "1110" => hex(hexlen-I):='E';
-             when "1111" => hex(hexlen-I):='F';
-             when "ZZZZ" => hex(hexlen-I):='z';
-             when "UUUU" => hex(hexlen-I):='u';
-             when "XXXX" => hex(hexlen-I):='x';
-             when others => hex(hexlen-I):='?';
-        end case;
-    end loop;
-    return hex(1 to hexlen);
- end function TO_HEX_STRING;
+  FUNCTION MIN (LEFT, RIGHT : INTEGER) RETURN INTEGER IS
+  BEGIN
+    IF LEFT < RIGHT THEN
+      RETURN LEFT;
+    ELSE
+      RETURN RIGHT;
+    END IF;
+  END MIN;
+  FUNCTION TO_STRING (a : std_logic_vector) RETURN STRING IS
+    VARIABLE b : STRING (1 TO a'length) := (OTHERS => NUL);
+    VARIABLE stri : INTEGER := 1;
+  BEGIN
+    FOR i IN a'RANGE LOOP
+      b(stri) := std_logic'image(a((i)))(2);
+      stri := stri + 1;
+    END LOOP;
+    RETURN b;
+  END TO_STRING;
+  FUNCTION TO_I(ARG : IN STD_LOGIC_VECTOR) RETURN NATURAL IS
+  BEGIN
+    RETURN TO_INTEGER(UNSIGNED(ARG));
+  END TO_I;
 
- function TO_HEX_STRING(slv: unsigned) return string is
- begin
-    return TO_HEX_STRING(std_logic_vector(slv));
- end function TO_HEX_STRING;
- function CEIL_LOG_2(ARG : in INTEGER) return INTEGER IS
- begin
-   return INTEGER(CEIL(LOG2(REAL(ARG))));
- end CEIL_LOG_2;
- 	-- -----------------------------------------------------------------------------------------------------------
-  function MODIFY_VECTOR(
-    index_in : in INTEGER; 
-    vector : in STD_LOGIC_VECTOR; 
-    value_in : in STD_LOGIC
-    ) return STD_LOGIC_VECTOR is
-  variable v : STD_LOGIC_VECTOR(vector'RANGE) := (others=>'0');
-  begin
+  FUNCTION TO_SLV(ARG : IN UNSIGNED) RETURN STD_LOGIC_VECTOR IS
+  BEGIN
+    RETURN STD_LOGIC_VECTOR(ARG);
+  END TO_SLV;
+
+  FUNCTION TO_SLV(ARG : IN SIGNED) RETURN STD_LOGIC_VECTOR IS
+  BEGIN
+    RETURN STD_LOGIC_VECTOR(ARG);
+  END TO_SLV;
+  -- converts a std_logic_vector into a hex string.
+  FUNCTION TO_HEX_STRING(slv : std_logic_vector) RETURN STRING IS
+    VARIABLE hexlen : INTEGER;
+    VARIABLE longslv : std_logic_vector(67 DOWNTO 0) := (OTHERS => '0');
+    VARIABLE hex : STRING(1 TO 16);
+    VARIABLE fourbit : std_logic_vector(3 DOWNTO 0);
+  BEGIN
+    hexlen := (slv'left + 1)/4;
+    IF (slv'left + 1) MOD 4 /= 0 THEN
+      hexlen := hexlen + 1;
+    END IF;
+    longslv(slv'left DOWNTO 0) := slv;
+    FOR i IN (hexlen - 1) DOWNTO 0 LOOP
+      fourbit := longslv(((i * 4) + 3) DOWNTO (i * 4));
+      CASE fourbit IS
+        WHEN "0000" => hex(hexlen - I) := '0';
+        WHEN "0001" => hex(hexlen - I) := '1';
+        WHEN "0010" => hex(hexlen - I) := '2';
+        WHEN "0011" => hex(hexlen - I) := '3';
+        WHEN "0100" => hex(hexlen - I) := '4';
+        WHEN "0101" => hex(hexlen - I) := '5';
+        WHEN "0110" => hex(hexlen - I) := '6';
+        WHEN "0111" => hex(hexlen - I) := '7';
+        WHEN "1000" => hex(hexlen - I) := '8';
+        WHEN "1001" => hex(hexlen - I) := '9';
+        WHEN "1010" => hex(hexlen - I) := 'A';
+        WHEN "1011" => hex(hexlen - I) := 'B';
+        WHEN "1100" => hex(hexlen - I) := 'C';
+        WHEN "1101" => hex(hexlen - I) := 'D';
+        WHEN "1110" => hex(hexlen - I) := 'E';
+        WHEN "1111" => hex(hexlen - I) := 'F';
+        WHEN "ZZZZ" => hex(hexlen - I) := 'z';
+        WHEN "UUUU" => hex(hexlen - I) := 'u';
+        WHEN "XXXX" => hex(hexlen - I) := 'x';
+        WHEN OTHERS => hex(hexlen - I) := '?';
+      END CASE;
+    END LOOP;
+    RETURN hex(1 TO hexlen);
+  END FUNCTION TO_HEX_STRING;
+
+  FUNCTION TO_HEX_STRING(slv : unsigned) RETURN STRING IS
+  BEGIN
+    RETURN TO_HEX_STRING(std_logic_vector(slv));
+  END FUNCTION TO_HEX_STRING;
+  FUNCTION CEIL_LOG_2(ARG : IN INTEGER) RETURN INTEGER IS
+  BEGIN
+    RETURN INTEGER(CEIL(LOG2(REAL(ARG))));
+  END CEIL_LOG_2;
+  -- -----------------------------------------------------------------------------------------------------------
+  FUNCTION MODIFY_VECTOR(
+    index_in : IN INTEGER;
+    vector : IN STD_LOGIC_VECTOR;
+    value_in : IN STD_LOGIC
+  ) RETURN STD_LOGIC_VECTOR IS
+    VARIABLE v : STD_LOGIC_VECTOR(vector'RANGE) := (OTHERS => '0');
+  BEGIN
     v := vector;
     v(index_in) := value_in;
-    return v;
-  end MODIFY_VECTOR;    
- 	-- -----------------------------------------------------------------------------------------------------------  
-	function GET_RANDOM(rand : in REAL) return INTEGER is
-		variable irand : INTEGER;
-	begin
-		irand := INTEGER((rand * 100.0 - 0.5) + 50.0);
-		return irand;
-	end; 
-end utils_pkg;
+    RETURN v;
+  END MODIFY_VECTOR;
+  -- -----------------------------------------------------------------------------------------------------------  
+  FUNCTION GET_RANDOM(rand : IN REAL) RETURN INTEGER IS
+    VARIABLE irand : INTEGER;
+  BEGIN
+    irand := INTEGER((rand * 100.0 - 0.5) + 50.0);
+    RETURN irand;
+  END;
+END utils_pkg;

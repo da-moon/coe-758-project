@@ -1,26 +1,25 @@
 
-architecture behaviour of cache_files_generator is
-	constant number_of_bits_in_a_block       : INTEGER := DEFAULT_BLOCK_SIZE * DEFAULT_DATA_WIDTH;
-begin
-	process
-		file tagFile : TEXT open WRITE_MODE is TAG_FILENAME & FILE_EXTENSION;
-		file dataFile : TEXT open WRITE_MODE is DATA_FILENAME & FILE_EXTENSION;
-		variable cacheBlock    : STD_LOGIC_VECTOR(number_of_bits_in_a_block - 1 downto 0) := (others => '0');
-		variable tag           : STD_LOGIC_VECTOR(CALCULATE_TAG_VECTOR_SIZE - 1 downto 0)   := (others => '0');
-		variable cacheTagLine  : LINE;
-		variable cacheDataLine : LINE;
+ARCHITECTURE behaviour OF cache_files_generator IS
+	CONSTANT number_of_bits_in_a_block : INTEGER := DEFAULT_BLOCK_SIZE * DEFAULT_DATA_WIDTH;
+BEGIN
+	PROCESS
+		FILE tagFile : TEXT OPEN WRITE_MODE IS TAG_FILENAME & FILE_EXTENSION;
+		FILE dataFile : TEXT OPEN WRITE_MODE IS DATA_FILENAME & FILE_EXTENSION;
+		VARIABLE cacheBlock : STD_LOGIC_VECTOR(number_of_bits_in_a_block - 1 DOWNTO 0) := (OTHERS => '0');
+		VARIABLE tag : STD_LOGIC_VECTOR(CALCULATE_TAG_VECTOR_SIZE - 1 DOWNTO 0) := (OTHERS => '0');
+		VARIABLE cacheTagLine : LINE;
+		VARIABLE cacheDataLine : LINE;
 
-	begin
-		for j in 0 to DEFAULT_ADDRESS_WIDTH - 1 loop
+	BEGIN
+		FOR j IN 0 TO DEFAULT_ADDRESS_WIDTH - 1 LOOP
 			hwrite(cacheTagLine, tag);
 			writeline(tagFile, cacheTagLine);
-
 			hwrite(cacheDataLine, cacheBlock);
 			writeline(dataFile, cacheDataLine);
-		end loop;
+		END LOOP;
 
-		wait;
+		WAIT;
 
-	end process;
+	END PROCESS;
 
-end architecture;
+END ARCHITECTURE;

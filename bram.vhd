@@ -1,23 +1,22 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.all;
-use IEEE.NUMERIC_STD.ALL;
-use STD.TEXTIO.ALL;
-use IEEE.STD_LOGIC_TEXTIO.ALL;
-use work.cache_pkg.all;
-use work.utils_pkg.all;
-entity bram is
-    generic ( 
-      ADDR     : integer  := 10;
-      DATA     : integer  := 32;
-      EDGE     : EdgeType := RISING;
-      MODE     : MODEType := NO_CHANGE;
-      RamFileName     : string 
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+USE STD.TEXTIO.ALL;
+USE IEEE.STD_LOGIC_TEXTIO.ALL;
+USE work.cache_pkg.ALL;
+USE work.utils_pkg.ALL;
+ENTITY bram IS
+  GENERIC (
+    ADDR : INTEGER := 10;
+    DATA : INTEGER := 32;
+    EDGE : EdgeType := RISING;
+    MODE : MODEType := NO_CHANGE;
+    RamFileName : STRING
   );
-  port (
-        clk, we: in  STD_LOGIC;
-         adr    : in  STD_LOGIC_VECTOR(ADDR-1 downto 0);
-         din    : in  STD_LOGIC_VECTOR(DATA-1 downto 0);
-         dout   : out STD_LOGIC_VECTOR(DATA-1 downto 0)
-       );
-end;
-
+  PORT (
+    clk, we : IN STD_LOGIC;
+    adr : IN STD_LOGIC_VECTOR(ADDR - 1 DOWNTO 0);
+    din : IN STD_LOGIC_VECTOR(DATA - 1 DOWNTO 0);
+    dout : OUT STD_LOGIC_VECTOR(DATA - 1 DOWNTO 0)
+  );
+END;

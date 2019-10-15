@@ -1,10 +1,10 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
-use STD.TEXTIO.ALL;
-use IEEE.STD_LOGIC_TEXTIO.ALL;
-use work.cache_pkg.all;
-use work.utils_pkg.all;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+USE STD.TEXTIO.ALL;
+USE IEEE.STD_LOGIC_TEXTIO.ALL;
+USE work.cache_pkg.ALL;
+USE work.utils_pkg.ALL;
 -- ----------------------------------------------------------------------------------------------------------------------
 -- direct_mapped_cache_controller is the entity that handles the 
 -- read and write operations to the tag BRAM and data BRAM.it stores whether a 
@@ -38,32 +38,32 @@ use work.utils_pkg.all;
 -- | data_from_bram        | address bus for data coming from bram                                                       |
 -- |---------------------------------------------------------------------------------------------------------------------|
 
-entity direct_mapped_cache_controller is
-	port(
-		clk              : in    STD_LOGIC; 
-		reset            : in    STD_LOGIC; 
-		add_cpu          	: in    STD_LOGIC_VECTOR(DEFAULT_MEMORY_ADDRESS_WIDTH-1 downto 0);	
-		data_cpu       	 	: inout STD_LOGIC_VECTOR(DEFAULT_DATA_WIDTH-1 downto 0); 			
-		cache_memory_data_bus 		   	: out STD_LOGIC_VECTOR(DEFAULT_DATA_WIDTH*DEFAULT_BLOCK_SIZE-1 downto 0);
-		valid            	: inout STD_LOGIC;
-		dirty         	 	: inout STD_LOGIC; 
-		set_valid         	: in    STD_LOGIC; 
-		set_dirty         	: in    STD_LOGIC;
-		hit 			 	: out   STD_LOGIC;
-		rd_word	 	: in	STD_LOGIC;
-		wr_word   	: in	STD_LOGIC; 
-		wr_rd 	: in	STD_LOGIC; 
-		wr_cache_block_Line 	: in	STD_LOGIC; 
-		rd_cache_block_line 	: in	STD_LOGIC;
-		index 		: out STD_LOGIC_VECTOR(CALCULATE_INDEX_VECTOR_SIZE- 1 downto 0);
-		tag_to_bram 		: out STD_LOGIC_VECTOR(CALCULATE_TAG_VECTOR_SIZE- 1 downto 0);
-		tag_from_bram 	: in STD_LOGIC_VECTOR(CALCULATE_TAG_VECTOR_SIZE- 1  downto 0);
-		write_to_tag_bram 	: out STD_LOGIC;
-		write_to_data_bram		: out STD_LOGIC;
-		data_to_bram		    : out STD_LOGIC_VECTOR(DEFAULT_DATA_WIDTH*DEFAULT_BLOCK_SIZE-1 downto 0);
-		data_from_bram	    : in STD_LOGIC_VECTOR(DEFAULT_DATA_WIDTH*DEFAULT_BLOCK_SIZE-1 downto 0);
+ENTITY direct_mapped_cache_controller IS
+	PORT (
+		clk : IN STD_LOGIC;
+		reset : IN STD_LOGIC;
+		add_cpu : IN STD_LOGIC_VECTOR(DEFAULT_MEMORY_ADDRESS_WIDTH - 1 DOWNTO 0);
+		data_cpu : INOUT STD_LOGIC_VECTOR(DEFAULT_DATA_WIDTH - 1 DOWNTO 0);
+		cache_memory_data_bus : OUT STD_LOGIC_VECTOR(DEFAULT_DATA_WIDTH * DEFAULT_BLOCK_SIZE - 1 DOWNTO 0);
+		valid : INOUT STD_LOGIC;
+		dirty : INOUT STD_LOGIC;
+		set_valid : IN STD_LOGIC;
+		set_dirty : IN STD_LOGIC;
+		hit : OUT STD_LOGIC;
+		rd_word : IN STD_LOGIC;
+		wr_word : IN STD_LOGIC;
+		wr_rd : IN STD_LOGIC;
+		wr_cache_block_Line : IN STD_LOGIC;
+		rd_cache_block_line : IN STD_LOGIC;
+		index : OUT STD_LOGIC_VECTOR(CALCULATE_INDEX_VECTOR_SIZE - 1 DOWNTO 0);
+		tag_to_bram : OUT STD_LOGIC_VECTOR(CALCULATE_TAG_VECTOR_SIZE - 1 DOWNTO 0);
+		tag_from_bram : IN STD_LOGIC_VECTOR(CALCULATE_TAG_VECTOR_SIZE - 1 DOWNTO 0);
+		write_to_tag_bram : OUT STD_LOGIC;
+		write_to_data_bram : OUT STD_LOGIC;
+		data_to_bram : OUT STD_LOGIC_VECTOR(DEFAULT_DATA_WIDTH * DEFAULT_BLOCK_SIZE - 1 DOWNTO 0);
+		data_from_bram : IN STD_LOGIC_VECTOR(DEFAULT_DATA_WIDTH * DEFAULT_BLOCK_SIZE - 1 DOWNTO 0);
 		-- TODO Remove ? 
-		new_cache_block_line 	: in STD_LOGIC_VECTOR(DEFAULT_DATA_WIDTH*DEFAULT_BLOCK_SIZE-1 downto 0)
+		new_cache_block_line : IN STD_LOGIC_VECTOR(DEFAULT_DATA_WIDTH * DEFAULT_BLOCK_SIZE - 1 DOWNTO 0)
 	);
 
-end;
+END;

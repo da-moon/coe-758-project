@@ -1,33 +1,38 @@
-library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use ieee.numeric_std.all;
-use work.utils_pkg.ALL;
-use work.cache_pkg.ALL;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE ieee.numeric_std.ALL;
+USE work.utils_pkg.ALL;
+USE work.cache_pkg.ALL;
 -- this is a utility package used to test cache
-package cache_test_pkg is
-    -- rerun_process - value determines whether to rerun the testbench process or not.
-	constant rerun_process : STD_LOGIC := '0';
-    constant break_line : STRING := "----------------------------------------------------------------------------------------------";
-	TYPE BLOCK_LINE IS ARRAY (DEFAULT_BLOCK_SIZE - 1 downto 0) of STD_LOGIC_VECTOR(DEFAULT_DATA_WIDTH - 1 downto 0);
-    subtype CACHE_BLOCK_LINE_RANGE is NATURAL range (DEFAULT_BLOCK_SIZE * DEFAULT_DATA_WIDTH)-1 downto 0;
-    -- -----------------------------------------------------------------------------------------------------------
+PACKAGE cache_test_pkg IS
+	-- rerun_process - value determines whether to rerun the testbench process or not.
+	CONSTANT rerun_process : STD_LOGIC := '0';
+	CONSTANT break_line : STRING := "----------------------------------------------------------------------------------------------";
+	TYPE BLOCK_LINE IS ARRAY (DEFAULT_BLOCK_SIZE - 1 DOWNTO 0) OF STD_LOGIC_VECTOR(DEFAULT_DATA_WIDTH - 1 DOWNTO 0);
+	SUBTYPE CACHE_BLOCK_LINE_RANGE IS NATURAL RANGE (DEFAULT_BLOCK_SIZE * DEFAULT_DATA_WIDTH) - 1 DOWNTO 0;
+	-- -----------------------------------------------------------------------------------------------------------
 	-- INIT_BLOCK_LINE -  initializes a block line with the given parameters.
 	-- -----------------------------------------------------------------------------------------------------------
-	function INIT_BLOCK_LINE(ARG1, ARG2, ARG3, ARG4 : in INTEGER) return BLOCK_LINE;
+	FUNCTION INIT_BLOCK_LINE(ARG1, ARG2, ARG3, ARG4 : IN INTEGER) RETURN BLOCK_LINE;
+	FUNCTION GENERATE_CPU_ADDRESS(ARG: IN INTEGER) RETURN STD_LOGIC_VECTOR;
 	-- -----------------------------------------------------------------------------------------------------------
 	-- GET_TAG -  returns tag as std logic vector.
 	-- -----------------------------------------------------------------------------------------------------------
-    function GET_TAG(ARG : in INTEGER) return STD_LOGIC_VECTOR ;
+	FUNCTION GET_TAG(ARG : IN INTEGER) RETURN STD_LOGIC_VECTOR;
 	-- -----------------------------------------------------------------------------------------------------------
-   	-- GET_INDEX -  returns index as std logic vector.
+	-- GET_INDEX -  returns index as std logic vector.
 	-- -----------------------------------------------------------------------------------------------------------
-    function GET_INDEX(ARG : in INTEGER) return STD_LOGIC_VECTOR ;
+	FUNCTION GET_INDEX(ARG : IN INTEGER) RETURN STD_LOGIC_VECTOR;
 	-- -----------------------------------------------------------------------------------------------------------
-    -- GET_OFFSET -  returns offset as std logic vector.
+	-- GET_OFFSET -  returns offset as std logic vector.
 	-- -----------------------------------------------------------------------------------------------------------
-    function GET_OFFSET(ARG : in INTEGER) return STD_LOGIC_VECTOR ;
+	FUNCTION GET_OFFSET(ARG : IN INTEGER) RETURN STD_LOGIC_VECTOR;
 	-- -----------------------------------------------------------------------------------------------------------
-    -- GET_DATA -  returns data as std logic vector.
+	-- GET_DATA -  returns data as std logic vector.
 	-- -----------------------------------------------------------------------------------------------------------
- function GET_DATA(ARG : in INTEGER) return STD_LOGIC_VECTOR ;
+	FUNCTION GET_DATA(ARG : IN INTEGER) RETURN STD_LOGIC_VECTOR;
+	FUNCTION GET_TAG(ARG : IN STD_LOGIC_VECTOR) RETURN STD_LOGIC_VECTOR ;
+	FUNCTION GET_INDEX(ARG : IN STD_LOGIC_VECTOR) RETURN STD_LOGIC_VECTOR ;
+	FUNCTION GET_OFFSET(ARG : IN STD_LOGIC_VECTOR) RETURN STD_LOGIC_VECTOR ;
+	FUNCTION GET_DATA_DEFAULTS(ARG : IN INTEGER) RETURN STD_LOGIC_VECTOR;
 END PACKAGE;

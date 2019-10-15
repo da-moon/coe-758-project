@@ -1,20 +1,20 @@
-library IEEE;
-use IEEE.std_logic_1164.all;
- -- VHDL2008 lib
-use IEEE.std_logic_textio.all;         
-use STD.textio.all;
-use work.cache_pkg.all;
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.ALL;
+-- VHDL2008 lib
+USE IEEE.std_logic_textio.ALL;
+USE STD.textio.ALL;
+USE work.cache_pkg.ALL;
 
 -- --------------------------------------------------------------------------------
 -- Definition of entity.
 -- --------------------------------------------------------------------------------
-entity cache_files_generator is
-	generic(
+ENTITY cache_files_generator IS
+	GENERIC (
 		-- Filename of tag cache.
-		TAG_FILENAME         : STRING  := "./imem/tag";
+		TAG_FILENAME : STRING := "./imem/tag";
 		-- Filename of instruction cache.
-		DATA_FILENAME        : STRING  := "./imem/data";
+		DATA_FILENAME : STRING := "./imem/data";
 		-- File extension of instruction file.
-		FILE_EXTENSION       : STRING  := ".txt"
+		FILE_EXTENSION : STRING := ".txt"
 	);
-end;
+END;

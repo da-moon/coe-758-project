@@ -48,8 +48,8 @@ PACKAGES = ./utils_pkg  ./utils_pkg_body  ./cache_pkg ./cache_pkg_body ./cache_t
 MODULES?= $(filter-out  $(PACKAGES),$(patsubst %.vhd,%, $(call rwildcard,./,*.vhd)) )
 TEMP ?= 
 ANALYZE_TARGETS?=$(addsuffix .vhd, $(subst ./,,${PACKAGES}))$(SPACE) $(addsuffix .vhd, $(subst ./,,${MODULES}))$(SPACE) $(addsuffix _behaviour.vhdl, $(subst ./,,${MODULES})) 
-SKIP_TESTS=bram_tb cpu_gen_tb direct_mapped_cache_controller_tb cpu_gen_tb clock_gen_tb
-STOP_TEST_TIME_FLAG= --stop-time=50us
+SKIP_TESTS=bram_tb direct_mapped_cache_controller_tb clock_gen_tb
+STOP_TEST_TIME_FLAG= --stop-time=1000us
 TESTS=$(addsuffix _tb.vhdl, $(subst ./,,${MODULES}))
 ifeq ($(DOCKER_ENV),true)
     ifeq ($(shell ${WHICH} docker 2>${DEVNUL}),)
