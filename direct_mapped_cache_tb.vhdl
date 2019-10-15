@@ -118,15 +118,16 @@ begin
 		writeline(output, L);
 		data_cpu <= (others => 'Z');
 		
-		report "init dirty [" & STD_LOGIC'IMAGE(dirty) & "]." severity NOTE;
 
 		-- ---------------------------------------------------------------------------------------------------
 		-- testing reset bit
 		-- ---------------------------------------------------------------------------------------------------
 		reset <= '1';
 		wait until rising_edge(clk);
-		-- reset <= '0';
-		-- wait until rising_edge(clk);
+		wait until falling_edge(clk);
+		reset <= '0';
+		wait until rising_edge(clk);
+		wait until falling_edge(clk);
 
 		report "[TEST] checking valid and dirty bits after reset" severity NOTE;
 		for I in 0 to DEFAULT_ADDRESS_WIDTH - 1 loop
@@ -137,6 +138,8 @@ begin
 			index   := GET_INDEX(I);
 			offset  := (others => '0');
 			add_cpu <= tag1 & index & offset;
+			wait until rising_edge(clk); 
+			wait until falling_edge(clk);
 			report "valid [" & STD_LOGIC'IMAGE(valid) & "]." severity NOTE;
 			report "dirty [" & STD_LOGIC'IMAGE(dirty) & "]." severity NOTE;
 			report "hit [" & STD_LOGIC'IMAGE(hit) & "]." severity NOTE;
@@ -151,11 +154,10 @@ begin
 				report "[FAILURE] hit bit => "&"Actual Value [" & STD_LOGIC'IMAGE(hit) & "]" & " != expected [0]" severity FAILURE;
 			end if;
 			wait until rising_edge(clk);
-			-- wait until falling_edge(clk);
+			wait until falling_edge(clk);
 		end loop;
-		-- wait for 10 ns;
 		wait until rising_edge(clk);
-		-- wait until falling_edge(clk);
+		wait until falling_edge(clk);
 		report "[TEST] checking writing single words to one cache block" severity NOTE;
 		for I in 0 to DEFAULT_ADDRESS_WIDTH - 1 loop
 			-- Create random number.
@@ -166,6 +168,8 @@ begin
 			wr_word <= '1';
 			rd_word <= '0';
 			index := GET_INDEX(I);
+			wait until rising_edge(clk); 
+			wait until falling_edge(clk);
 			for J in 0 to DEFAULT_BLOCK_SIZE - 1 loop
 				offset := GET_OFFSET(J);
 				add_cpu <= tag1 & index & offset;
@@ -175,24 +179,23 @@ begin
 				data_cpu      <= GET_DATA(irand);
 				blockLine(J) := GET_DATA(irand);
 				my_data_word   <= blockLine(J);
-				wait until rising_edge(clk);
-				report "payload [0x" & TO_HEX_STRING(data_cpu) &"] cpu address [0x" & TO_HEX_STRING(add_cpu)  & "] offset [" & INTEGER'IMAGE(J) & "] index [" & INTEGER'IMAGE(I) & "] write [" & INTEGER'IMAGE(irand) & "] to cache block" severity NOTE;
 				wait until rising_edge(clk); 
-				-- wait until falling_edge(clk); 
-			end loop;
-			-- Wait.
-			-- wait for 50 ns;
+				wait until falling_edge(clk);
+					report "payload [0x" & TO_HEX_STRING(data_cpu) &"] cpu address [0x" & TO_HEX_STRING(add_cpu)  & "] offset [" & INTEGER'IMAGE(J) & "] index [" & INTEGER'IMAGE(I) & "] write [" & INTEGER'IMAGE(irand) & "] to cache block" severity NOTE;
+				wait until rising_edge(clk); 
+				wait until falling_edge(clk); 
+			end loop;	
 			-- Set the mode to READ.
 			wr_word <= '0';
 			rd_word <= '1';
+			wait until rising_edge(clk); 
+			wait until falling_edge(clk);
 			for J in 0 to DEFAULT_BLOCK_SIZE - 1 loop
 				data_cpu <= (others => 'Z');
 				offset := GET_OFFSET(J);
 				add_cpu <= tag1 & index & offset;
 				wait until rising_edge(clk); 
-				-- wait until falling_edge(clk); 
-				-- wait until rising_edge(clk); 
-				-- wait until falling_edge(clk); 
+				wait until falling_edge(clk); 
 				if (data_cpu = blockLine(J)) then
 					report "[SUCCESS] data_stored_in_mem [0x" & TO_HEX_STRING(blockLine(J)) &"] cpu address [0x" & TO_HEX_STRING(add_cpu)  & "] offset [" & INTEGER'IMAGE(J) & "] index [" & INTEGER'IMAGE(I) & "]" severity NOTE;
 				else 
@@ -200,11 +203,12 @@ begin
 					-- report "[FAILURE] cpu address [0x" & TO_HEX_STRING(add_cpu)  & "] offset [" & INTEGER'IMAGE(J) & "] index [" & INTEGER'IMAGE(I) & "] Actual Value [0x" & TO_HEX_STRING(data_cpu) & "] != Expected Value [0x" & TO_HEX_STRING(blockLine(J)) & "]." severity FAILURE;
 				end if;
 				wait until rising_edge(clk); 
-
+				wait until falling_edge(clk);
 			end loop;
 			REPORT_BREAK_LINE;
-
 		end loop;
+		wait until rising_edge(clk); 
+		wait until falling_edge(clk);
 		report "[TEST] checking tags..." severity NOTE;
 		for I in 0 to DEFAULT_ADDRESS_WIDTH - 1 loop
 			uniform(seed1, seed2, rand);
@@ -221,20 +225,21 @@ begin
 				data_cpu      <= GET_DATA(irand);
 				blockLine(J) := GET_DATA(irand);
 				my_data_word   <= blockLine(J);
-				wait until rising_edge(clk);
-				-- wait until falling_edge(clk);
+				wait until rising_edge(clk); 
+				wait until falling_edge(clk);
 				report "payload [" & TO_STRING(data_cpu) &"cpu address [0x" & TO_HEX_STRING(add_cpu)  & "] offset [" & INTEGER'IMAGE(J) & "] index [" & INTEGER'IMAGE(I) & "] write [" & INTEGER'IMAGE(irand) & "] to cache block" severity NOTE;
 				wait until rising_edge(clk); 
-				-- wait until falling_edge(clk);  
+				wait until falling_edge(clk); 
 			end loop;
-			-- wait for 50 ns;
 			wr_word <= '0';
 			rd_word <= '1';
+			wait until rising_edge(clk); 
+			wait until falling_edge(clk);
 			for J in 0 to DEFAULT_BLOCK_SIZE - 1 loop
 				offset := GET_OFFSET(J);
 				add_cpu <= tag1 & index & offset;
 				wait until rising_edge(clk); 
-				-- wait until falling_edge(clk); 
+				wait until falling_edge(clk);
 				if (valid = '1' and hit = '1') then
 					report "valid and hit bits are correct." severity NOTE;
 				elsif (valid = '0') then
@@ -243,16 +248,18 @@ begin
 					report "hit bit is not correct." severity FAILURE;
 				end if;
 				wait until rising_edge(clk); 
-				-- wait for 5 ns;
+				wait until falling_edge(clk);
 			end loop;
 			uniform(seed1, seed2, rand);
 			irand := GET_RANDOM(rand);
 			tag2  := GET_TAG(irand);
+			wait until rising_edge(clk); 
+			wait until falling_edge(clk);
 			for J in 0 to DEFAULT_BLOCK_SIZE - 1 loop
 				offset := GET_OFFSET(J);
 				add_cpu <= tag2 & index & offset;
-				wait until rising_edge(clk); --
-				-- wait until falling_edge(clk); --  
+				wait until rising_edge(clk); 
+				wait until falling_edge(clk);
 				if (tag1 /= tag2 and hit = '0' and valid = '1') then
 					report "tags are different, valid and hit bits are correct." severity NOTE;
 				elsif (tag1 = tag2 and hit = '1' and valid = '1') then
@@ -262,16 +269,18 @@ begin
 				else
 					report "tags are equal, valid and hit bits are not correct." severity FAILURE;
 				end if;
-				wait until rising_edge(clk);
-
+				wait until rising_edge(clk); 
+				wait until falling_edge(clk);
 			end loop;
 			REPORT_BREAK_LINE;
 		end loop;
+		wait until rising_edge(clk); 
+		wait until falling_edge(clk);
 		report "FINISHED checking tags..." severity NOTE;
 		-- Check whether to rerun the process.
-		if rerun_process = '0' then
+		-- if rerun_process = '0' then
 			wait;
-		end if;
+		-- end if;
 
 	end process;
 

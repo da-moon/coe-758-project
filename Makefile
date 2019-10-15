@@ -37,8 +37,10 @@ MAKEFILE_LIST=Makefile
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
 # ENVIRONMENT Setting
 GHDL_IMAGE=ghdl/ext:latest
+MERMAID_IMAGE=mikoto2000/mermaid.cli
 DOCKER_ENV = true
 CMD_ARGUMENTS ?= $(cmd)
+STARTUP_SCRIPT ?= $(startup)
 TB_OPTION= --assert-level=error
 ####
 FLAGS=--warn-error 
@@ -46,8 +48,8 @@ PACKAGES = ./utils_pkg  ./utils_pkg_body  ./cache_pkg ./cache_pkg_body ./cache_t
 MODULES?= $(filter-out  $(PACKAGES),$(patsubst %.vhd,%, $(call rwildcard,./,*.vhd)) )
 TEMP ?= 
 ANALYZE_TARGETS?=$(addsuffix .vhd, $(subst ./,,${PACKAGES}))$(SPACE) $(addsuffix .vhd, $(subst ./,,${MODULES}))$(SPACE) $(addsuffix _behaviour.vhdl, $(subst ./,,${MODULES})) 
-SKIP_TESTS=bram_tb cpu_gen_tb
-STOP_TEST_TIME_FLAG= --stop-time=7us
+SKIP_TESTS=bram_tb cpu_gen_tb direct_mapped_cache_controller_tb cpu_gen_tb clock_gen_tb
+STOP_TEST_TIME_FLAG= --stop-time=50us
 TESTS=$(addsuffix _tb.vhdl, $(subst ./,,${MODULES}))
 ifeq ($(DOCKER_ENV),true)
     ifeq ($(shell ${WHICH} docker 2>${DEVNUL}),)
@@ -69,8 +71,8 @@ else
 endif
 
 
-.PHONY: all shell clean build analyze module cache_files
-.SILENT: all shell clean build analyze module cache_files
+.PHONY: all shell clean build analyze module cache_files mermaid
+.SILENT: all shell clean build analyze module cache_files mermaid
 
 # ex : make cmd="ls -lah"
 shell:
@@ -81,7 +83,9 @@ ifeq ($(DOCKER_ENV),true)
     endif
     ifneq ($(CONTAINER_RUNNING),true)
 	- @docker run --entrypoint "/bin/bash" -v ${CURDIR}:${DOCKER_CONTAINER_MOUNT_POINT} --name ${DOCKER_CONTAINER_NAME} --rm -d -i -t ${DOCKER_IMAGE} -c tail -f /dev/null
-	- @docker exec  --workdir ${DOCKER_CONTAINER_MOUNT_POINT} ${DOCKER_CONTAINER_NAME} /bin/bash -c "/opt/ghdl/install_vsix.sh"
+    ifneq ($(STARTUP_SCRIPT),)
+	- @docker exec  --workdir ${DOCKER_CONTAINER_MOUNT_POINT} ${DOCKER_CONTAINER_NAME} /bin/bash -c "${STARTUP_SCRIPT}"
+    endif
     endif
 endif
 endif
@@ -104,11 +108,11 @@ analyze: clean
 	- $(MKDIR) test_results
 	- $(MKDIR) imem
     ifeq ($(DOCKER_ENV),true)
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -i --workdir=./ *.vhd *.vhdl" container_name="ghdl_container" mount_point="/mnt/project"
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(TESTS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -m --ieee=synopsys --std=00 --workdir=./ cache_files_generator" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r -g -O3 --ieee=synopsys --std=00 cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -i --workdir=./ *.vhd *.vhdl" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(TESTS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -m --ieee=synopsys --std=00 --workdir=./ cache_files_generator" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r -g -O3 --ieee=synopsys --std=00 cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
     else
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -i --workdir=./ *.vhd *.vhdl"
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS)" 
@@ -128,8 +132,8 @@ build:  analyze
     ifeq ($(DOCKER_ENV),true)
 	- $(info Building in Docker Container)
 	for target in $(filter-out $(SKIP_TESTS),$(subst ./,, $(addsuffix _tb, ${MODULES}))); do \
-			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -e --ieee=synopsys $(FLAGS) $$target" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project" && \
-			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r --ieee=synopsys  $(FLAGS) $$target ${STOP_TEST_TIME_FLAG}" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"; \
+			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -e --ieee=synopsys $(FLAGS) $$target" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project" && \
+			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r --ieee=synopsys  $(FLAGS) $$target ${STOP_TEST_TIME_FLAG}" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"; \
 	done
     else
 	- $(info Building in local environment)
@@ -142,10 +146,27 @@ build:  analyze
 
 clean:
     ifeq ($(DOCKER_ENV),true)
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl --clean --workdir=./" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl --clean --workdir=./" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
     else
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl --clean --workdir=./"
     endif
 	- $(RM) work-obj93.cf *.o
 	- $(RM) test_results
 	- $(RM) imem
+MERMAID_FILES?=$(patsubst %.mmd,%,$(subst fixtures/mermaid/,, $(call rwildcard,fixtures/mermaid/,*.mmd)))
+
+mermaid:  clean
+	- $(CLEAR)
+	- $(MKDIR) fixtures/mermaid
+    ifeq ($(DOCKER_ENV),true)
+	for target in $(MERMAID_FILES); do \
+			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="mmdc -p /opt/local/mermaid.cli/puppeteer-config.json -i fixtures/mermaid/$$target.mmd -o fixtures/mermaid/$$target.png" docker_image="${MERMAID_IMAGE}" container_name="mermaid_ghdl" mount_point="/home/node/data" ; \
+	done
+    else
+    ifeq ($(shell ${WHICH} mmdc 2>${DEVNUL}),)
+        $(error "mmdc (mermaid compiler) is not in your system PATH. Please run `make dep` to install dependancy ")
+    endif
+	for target in $(MERMAID_FILES); do \
+			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="mmdc -i fixtures/mermaid/$$target.mmd -o fixtures/mermaid/$$target.png"; \
+	done
+    endif
