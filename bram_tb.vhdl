@@ -97,6 +97,10 @@ begin
 -- 
   wait until rst = '0';
   file_open(fstatus, fptr, C_FILE_NAME, write_mode);
+  write(L, string'("| write_enable | address | din  | dout |"), right, 2);
+  writeline(fptr, L);
+  write(L, string'("|--------------|---------|------|------|"), right, 2);
+  writeline(fptr, L);
   while (counter * 10 ns < TEST_TIME) loop
      wait until rising_edge(clk);
      we <= not we;
@@ -104,30 +108,49 @@ begin
         adr<=std_logic_vector(unsigned(adr) + (1));
         din <= std_logic_vector(unsigned(din) + (1));
      end if;
-        temp(1):=clk;
-        write(L, string'("clk : "), right, 2);
-        write(L, TO_STRING(temp), right, 2);
-        -- writeline(output, L);
-        writeline(fptr, L);
         temp(1):=we;
-        write(L, string'("write_enable : "), right, 2);
-        write(L, TO_STRING(temp), right, 2);
-        -- writeline(output, L);
+        write(L, string'("|"), right, 1);
+        -- for beautifying output ...
+        for C in 1 to (13-TO_STRING(temp)'length)/2 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+        write(L, TO_STRING(temp), right, 1);
+        for C in 1 to (13-TO_STRING(temp)'length)/2+1 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+        write(L, string'("|"), right, 1);
+        for C in 1 to (7-TO_STRING(temp)'length)/2 - 1 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+        write(L, string'("0x"), right, 1);
+        write(L, TO_HEX_STRING(adr), right, 1);
+        for C in 1 to (7-TO_STRING(temp)'length)/2 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+
+        write(L, string'("|"), right, 1);
+        for C in 1 to (4-TO_STRING(temp)'length)/2 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+        write(L, string'("0x"), right, 1);
+        write(L, TO_HEX_STRING(din), right, 1);
+       
+        for C in 1 to (4-TO_STRING(temp)'length)/2 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+
+        write(L, string'("|"), right, 1);
+        for C in 1 to (4-TO_STRING(temp)'length)/2 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+        write(L, string'("0x"), right, 1);
+        write(L, TO_HEX_STRING(dout), right, 1);
+        for C in 1 to (4-TO_STRING(temp)'length)/2 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+        write(L, string'("|"), right, 1);
         writeline(fptr, L);
-        write(L, string'("address :0x"), right, 2);
-        write(L, TO_HEX_STRING(adr), right, 2);
-        -- writeline(output, L);
-        writeline(fptr, L);
-        write(L, string'("din :0x"), right, 2);
-        write(L, TO_HEX_STRING(din), right, 2);
-        -- writeline(output, L);
-        writeline(fptr, L);
-        write(L, string'("dout :0x"), right, 2);
-        write(L, TO_HEX_STRING(dout), right, 2);
-        -- writeline(output, L);
-        writeline(fptr, L);
-        write(L, string'("-------------"), right, 2);
-        -- writeline(output, L);
+        write(L, string'("|--------------|---------|------|------|"), right, 2);
         writeline(fptr, L);
   end loop;
   wait until rising_edge(clk);

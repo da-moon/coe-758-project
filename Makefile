@@ -28,12 +28,8 @@ else
     SEP=/
 endif
 
-# ifeq (args,$(firstword $(MAKECMDGOALS)))
-  # use the rest as arguments
-  RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
-  # ...and turn them into do-nothing targets
-  $(eval $(RUN_ARGS):;@:)
-# endif
+RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
+$(eval $(RUN_ARGS):;@:)
 
 # Recursive wildcard 
 rwildcard=$(wildcard $1$2) $(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2))
@@ -43,17 +39,16 @@ THIS_FILE := $(lastword $(MAKEFILE_LIST))
 GHDL_IMAGE=ghdl/ext:latest
 DOCKER_ENV = true
 CMD_ARGUMENTS ?= $(cmd)
-TB_OPTION=--assert-level=error
+TB_OPTION= --assert-level=error
 ####
-FLAGS=--warn-error --work=work
-
-# PACKAGES = $(filter-out  cache_files_generator,$(patsubst %.vhd,%, $(call rwildcard,./,*_pkg.vhd)) $(patsubst %.vhd,%, $(call rwildcard,./,*_pkg_body.vhd))  )
-PACKAGES = $(patsubst %.vhd,%, $(call rwildcard,./,*_pkg.vhd)) $(patsubst %.vhd,%, $(call rwildcard,./,*_pkg_body.vhd))
-
+FLAGS=--warn-error 
+PACKAGES = ./utils_pkg  ./utils_pkg_body  ./cache_pkg ./cache_pkg_body ./cache_test_pkg ./cache_test_pkg_body
 MODULES?= $(filter-out  $(PACKAGES),$(patsubst %.vhd,%, $(call rwildcard,./,*.vhd)) )
 TEMP ?= 
-ANALYZE_TARGETS=$(addsuffix .vhd, ${PACKAGES})$(SPACE) $(addsuffix .vhd, ${MODULES})$(SPACE) $(addsuffix _behaviour.vhdl, ${MODULES}) 
-TESTS=$(addsuffix _tb.vhdl, ${MODULES})
+ANALYZE_TARGETS?=$(addsuffix .vhd, $(subst ./,,${PACKAGES}))$(SPACE) $(addsuffix .vhd, $(subst ./,,${MODULES}))$(SPACE) $(addsuffix _behaviour.vhdl, $(subst ./,,${MODULES})) 
+SKIP_TESTS=bram_tb cpu_gen_tb
+STOP_TEST_TIME_FLAG= --stop-time=7us
+TESTS=$(addsuffix _tb.vhdl, $(subst ./,,${MODULES}))
 ifeq ($(DOCKER_ENV),true)
     ifeq ($(shell ${WHICH} docker 2>${DEVNUL}),)
         $(error "docker is not in your system PATH. Please install docker to continue or set DOCKER_ENV = false in make file ")
@@ -101,48 +96,48 @@ ifneq ($(CMD_ARGUMENTS),)
 endif
 
 
-# test: 
-# 	- $(CLEAR) 
-# 	- @echo$(SPACE)  ${PACKAGES}
-# 	- @echo$(SPACE) 
+test: 
+	- $(CLEAR) 
+	- @echo$(SPACE)  ${PACKAGES}
+	- @echo$(SPACE) 
 analyze: clean
-	- $(RM) test_results
 	- $(MKDIR) test_results
+	- $(MKDIR) imem
     ifeq ($(DOCKER_ENV),true)
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS) " docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -i --workdir=./ *.vhd *.vhdl" container_name="ghdl_container" mount_point="/mnt/project"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(TESTS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -m --ieee=synopsys --std=00 --workdir=./ cache_files_generator" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r -g -O3 --ieee=synopsys --std=00 cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
     else
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS) "
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -i --workdir=./ *.vhd *.vhdl"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS)" 
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(TESTS)"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -m --ieee=synopsys --std=00 --workdir=./ cache_files_generator"
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r -g -O3 --ieee=synopsys --std=00 cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data"
     endif
-	# - ghdl  -r -g -O3 --ieee=synopsys cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data
-#   ifeq ($(DOCKER_ENV),true)
-# 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r -g -O3 --ieee=synopsys cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"
-#     else
-# 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl  -r -g -O3 --ieee=synopsys cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data"
-#     endif
 module : 
 	- $(CLEAR) 
 	- $(TOUCH) $(addsuffix .vhd,$(RUN_ARGS))
 	- $(TOUCH) $(addsuffix _tb.vhdl,$(RUN_ARGS))
 	- $(TOUCH) $(addsuffix _behaviour.vhdl,$(RUN_ARGS))
 
+
 build:  analyze
 	- $(CLEAR)
     ifeq ($(DOCKER_ENV),true)
 	- $(info Building in Docker Container)
-	for target in $(subst ./,, $(addsuffix _tb, ${MODULES})); do \
+	for target in $(filter-out $(SKIP_TESTS),$(subst ./,, $(addsuffix _tb, ${MODULES}))); do \
 			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -e --ieee=synopsys $(FLAGS) $$target" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project" && \
-			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r --ieee=synopsys  $(FLAGS) $$target --stop-time=3us" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"; \
+			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r --ieee=synopsys  $(FLAGS) $$target ${STOP_TEST_TIME_FLAG}" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" mount_point="/mnt/project"; \
 	done
     else
 	- $(info Building in local environment)
-	for target in $(subst ./,, $(addsuffix _tb, ${MODULES})); do \
+	for target in $(filter-out $(SKIP_TESTS),$(subst ./,, $(addsuffix _tb, ${MODULES}))); do \
 			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -e --ieee=synopsys $(FLAGS) $$target" && \
-			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r --ieee=synopsys $(FLAGS) $$target --stop-time=3us"; \
+			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r --ieee=synopsys $(FLAGS) $$target ${STOP_TEST_TIME_FLAG}"; \
 	done
     endif
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) clean
 
 
 clean:
@@ -152,3 +147,5 @@ clean:
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl --clean --workdir=./"
     endif
 	- $(RM) work-obj93.cf *.o
+	- $(RM) test_results
+	- $(RM) imem

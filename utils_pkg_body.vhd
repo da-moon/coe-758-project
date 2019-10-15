@@ -85,7 +85,7 @@ package body utils_pkg is
    return INTEGER(CEIL(LOG2(REAL(ARG))));
  end CEIL_LOG_2;
  	-- -----------------------------------------------------------------------------------------------------------
-  function RETURN_MODIFIED_VECTOR(
+  function MODIFY_VECTOR(
     index_in : in INTEGER; 
     vector : in STD_LOGIC_VECTOR; 
     value_in : in STD_LOGIC
@@ -95,5 +95,12 @@ package body utils_pkg is
     v := vector;
     v(index_in) := value_in;
     return v;
-  end RETURN_MODIFIED_VECTOR;     
+  end MODIFY_VECTOR;    
+ 	-- -----------------------------------------------------------------------------------------------------------  
+	function GET_RANDOM(rand : in REAL) return INTEGER is
+		variable irand : INTEGER;
+	begin
+		irand := INTEGER((rand * 100.0 - 0.5) + 50.0);
+		return irand;
+	end; 
 end utils_pkg;

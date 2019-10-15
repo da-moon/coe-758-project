@@ -42,10 +42,10 @@ begin
       -- write(L, counter, right, 2);
       -- writeline(output, L);
    end loop;
-   write(L, string'("Final Count Value:"));
-   writeline(output, L);
-   write(L, counter, right, 2);
-   writeline(output, L);
+   -- write(L, string'("Final Count Value:"));
+   -- writeline(output, L);
+   -- write(L, counter, right, 2);
+   -- writeline(output, L);
    wait;
 end process;
 end testbench;

@@ -17,15 +17,19 @@ package utils_pkg is
   function TO_HEX_STRING(slv: unsigned) return string;
   function CEIL_LOG_2(ARG : in INTEGER) return INTEGER;
   -- -----------------------------------------------------------------------------------------------------------
-  -- RETURN_MODIFIED_VECTOR :
-  --  first modifies the given vector by copying the given vector and
+  -- MODIFY_VECTOR :
+  -- first modifies the given vector by copying the given vector and
   -- setting the value at the specified position with the given index.
   -- The new value at this position is given by the parameter.
   -- Finally, the function returns the modified vector.
   -- -----------------------------------------------------------------------------------------------------------
-  function RETURN_MODIFIED_VECTOR( 
+  function MODIFY_VECTOR( 
       index_in : in INTEGER;
       vector : in STD_LOGIC_VECTOR;
       value_in : in STD_LOGIC
   ) return STD_LOGIC_VECTOR;
+  -- -----------------------------------------------------------------------------------------------------------
+  -- GET_RANDOM -- returns a random integer between 50 and 150.
+  -- -----------------------------------------------------------------------------------------------------------
+  function GET_RANDOM(rand : in REAL) return INTEGER; 
 END PACKAGE;

@@ -1,4 +1,3 @@
-use std.textio.all;
 
 package body cache_pkg is
 
@@ -163,35 +162,35 @@ package body cache_pkg is
 			tag => (others => '0'), 
 			index => (others => '0'), 
 			offset => (others => '0'), 
-			indexAsInteger =>0,
-			offsetAsInteger =>0 
+			index_as_integer =>0,
+			offset_as_integer =>0 
 		);
 	begin
 		addr.tag    := ARG(CALCULATE_TAG_VECTOR_UPPER_INDEX downto CALCULATE_TAG_VECTOR_LOWER_INDEX);
 		addr.index  := ARG(CALCULATE_INDEX_VECTOR_UPPER_INDEX downto CALCULATE_INDEX_VECTOR_LOWER_INDEX);
 		addr.offset := ARG(CALCULATE_OFFSET_VECTOR_UPPER_INDEX downto CALCULATE_OFFSET_VECTOR_LOWER_INDEX);
 		-- ---------------------------------------------------------------------
-		-- addr.indexAsInteger := TO_INTEGER(UNSIGNED(addr.index));
-		-- addr.offsetAsInteger := TO_INTEGER(UNSIGNED(addr.offset(4 downto 3)));
+		-- addr.index_as_integer := TO_INTEGER(UNSIGNED(addr.index));
+		-- addr.offset_as_integer := TO_INTEGER(UNSIGNED(addr.offset(4 downto 3)));
 		-- ---------------------------------------------------------------------
 		-- deal with cases that are meta value ... may cause issues ... 
 		if not is_X(addr.index) then
-			addr.indexAsInteger := TO_INTEGER(UNSIGNED(addr.index));
+			addr.index_as_integer := TO_INTEGER(UNSIGNED(addr.index));
 		else 
-			addr.indexAsInteger := 0 ;
+			addr.index_as_integer := 0 ;
 		end if;
 		if not is_X(addr.offset(CALCULATE_OFFSET_VECTOR_UPPER_INDEX downto CALCULATE_OFFSET_VECTOR_UPPER_INDEX-1)) then
-			addr.offsetAsInteger := TO_INTEGER(UNSIGNED(addr.offset(CALCULATE_OFFSET_VECTOR_UPPER_INDEX downto CALCULATE_OFFSET_VECTOR_UPPER_INDEX-1)));
+			addr.offset_as_integer := TO_INTEGER(UNSIGNED(addr.offset(CALCULATE_OFFSET_VECTOR_UPPER_INDEX downto CALCULATE_OFFSET_VECTOR_UPPER_INDEX-1)));
 		else 
-			addr.offsetAsInteger := 0 ;
+			addr.offset_as_integer := 0 ;
 		end if;
 		-- Check whether the offset integer is correct.
-		if (addr.offsetAsInteger > DEFAULT_BLOCK_SIZE-1 or addr.offsetAsInteger < 0) then
-			report "offset as integer is false. " & INTEGER'IMAGE(addr.offsetAsInteger) severity FAILURE; 
+		if (addr.offset_as_integer > DEFAULT_BLOCK_SIZE-1 or addr.offset_as_integer < 0) then
+			report "offset as integer is false. " & INTEGER'IMAGE(addr.offset_as_integer) severity FAILURE; 
 		end if;
 		-- Check whether the index integer is correct.
-		if (addr.indexAsInteger > DEFAULT_ADDRESS_WIDTH-1 or addr.indexAsInteger < 0) then
-			report "index as integer is false. " & INTEGER'IMAGE(addr.indexAsInteger) severity FAILURE;
+		if (addr.index_as_integer > DEFAULT_ADDRESS_WIDTH-1 or addr.index_as_integer < 0) then
+			report "index as integer is false. " & INTEGER'IMAGE(addr.index_as_integer) severity FAILURE;
 		end if;
 		-- Return the memory address.
 		return addr;

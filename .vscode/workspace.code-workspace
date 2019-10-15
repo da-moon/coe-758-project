@@ -4,9 +4,6 @@
 			"path": "/home/damoonazarpazhooh/go/src/github.com/damoonazarpazhooh/coe-758-project"
 		},
 		{
-			"path": "/home/damoonazarpazhooh/go/src/github.com/damoonazarpazhooh/AdvancedSystemOnChipDesign"
-		},
-		{
 			"path": "/home/damoonazarpazhooh/go/src/github.com/damoonazarpazhooh/758_temp"
 		}
 	],
@@ -16,11 +13,11 @@
 		
 				{
 					"match": "\\.vhd$",
-					"cmd": "make analyze"
+					"cmd": "echo analyze"
 				},
 				{
 					"match": "\\.vhdl$",
-					"cmd": "make analyze"
+					"cmd": "echo analyze"
 				}
 			]
 		}

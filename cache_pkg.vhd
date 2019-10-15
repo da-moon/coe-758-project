@@ -58,8 +58,8 @@ package cache_pkg is
 		tag    : STD_LOGIC_VECTOR(CALCULATE_TAG_VECTOR_SIZE - 1 downto 0);
 		index  : STD_LOGIC_VECTOR(CALCULATE_INDEX_VECTOR_SIZE - 1 downto 0);
 		offset : STD_LOGIC_VECTOR(CALCULATE_OFFSET_VECTOR_SIZE - 1 downto 0);
-		indexAsInteger : INTEGER;
-		offsetAsInteger : INTEGER;
+		index_as_integer : INTEGER;
+		offset_as_integer : INTEGER;
     end record;
     -- -----------------------------------------------------------------------------------------------------------
 	-- GET_START_INDEX - it is used to determine the start index of the data word in the cache line.
@@ -86,7 +86,7 @@ package cache_pkg is
 	-- -----------------------------------------------------------------------------------------------------------
 	function TO_CACHE_BLOCK_LINE( ARG : in STD_LOGIC_VECTOR ) return CACHE_BLOCK_LINE;
 	-- -----------------------------------------------------------------------------------------------------------
-	-- The function converts the given vector to a memory address.
+	-- TO_MEMORY_ADDRESS - converts the given vector to a memory address.
 	-- -----------------------------------------------------------------------------------------------------------
 	function TO_MEMORY_ADDRESS(ARG : in STD_LOGIC_VECTOR) return MEMORY_ADDRESS;
 	END PACKAGE;

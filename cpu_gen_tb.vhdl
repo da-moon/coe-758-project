@@ -82,39 +82,66 @@ stim_proc: process
 
 begin
   WAIT for 1 ns;
-  -- write(L, string'("cpu_gen tests ... :"));
-  -- writeline(output, L);
+  write(L, string'("cpu_gen tests ... :"));
+  writeline(output, L);
   rst <= '1', '0' after 100 ns;
   counter := 0;
--- 
   eof       <= '0';
--- 
   wait until rst = '0';
   file_open(fstatus, fptr, C_FILE_NAME, write_mode);
+  
+
+  write(L, string'("| cs | wr_rd | add    | dout |"), right, 2);
+  writeline(fptr, L);
+  write(L, string'("|----|-------|--------|------|"), right, 2);
+  writeline(fptr, L);
+
   while (counter * 10 ns < TEST_TIME) loop
      wait until rising_edge(clk);
      trig <= not trig;
      if old_addr /= Address then 
         old_addr:=Address;
-        temp(1):=trig;
-        write(L, string'("TRIG : "), right, 2);
-        write(L, TO_STRING(temp), right, 2);
-        writeline(fptr, L);
+        write(L, string'("|"), right, 1);
         temp(1):=cs;
-        write(L, string'("CPU cs : "), right, 2);
-        write(L, TO_STRING(temp), right, 2);
-        writeline(fptr, L);
+        -- for beautifying output ...
+        for C in 1 to (4-TO_STRING(temp)'length)/2 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+        write(L, TO_STRING(temp), right,1);
+        for C in 1 to (4-TO_STRING(temp)'length)/2+1 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+        write(L, string'("|"), right, 1);
         temp(1):=wr_rd;
-        write(L, string'("CPU wr_rd : "), right, 2);
-        write(L, TO_STRING(temp), right, 2);
+        for C in 1 to (7-TO_STRING(temp)'length)/2 - 1 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+        write(L, TO_STRING(temp), right,1);
+        for C in 1 to (7-TO_STRING(temp)'length)/2+1 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+        write(L, string'("|"), right, 1);
+
+        for C in 1 to (6-TO_HEX_STRING(Address)'length)/2 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+        write(L, string'("0x"), right,1);
+        write(L, TO_HEX_STRING(Address), right,1);
+        for C in 1 to (6-TO_HEX_STRING(Address)'length)/2 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+        write(L, string'("|"), right, 1);
+        for C in 1 to (4-TO_HEX_STRING(DOut)'length)/2 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+        write(L, string'("0x"), right,1);
+        write(L, TO_HEX_STRING(DOut), right,1);
+        for C in 1 to (4-TO_HEX_STRING(DOut)'length)/2 loop
+          write(L, string'(" "), right, 1);
+        end loop;
+        write(L, string'("|"), right, 1);
         writeline(fptr, L);
-        write(L, string'("CPU OUT ADDRESS : "), right, 2);
-        write(L, TO_STRING(Address), right, 2);
-        writeline(fptr, L);
-        write(L, string'("CPU Data OUT : "), right, 2);
-        write(L, TO_STRING(DOut), right, 2);
-        writeline(fptr, L);
-        write(L, string'("-------------"), right, 2);
+        write(L, string'("|----|-------|--------|------|"), right, 2);
         writeline(fptr, L);
      end if;
   end loop;
