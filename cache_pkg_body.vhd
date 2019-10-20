@@ -170,20 +170,18 @@ PACKAGE BODY cache_pkg IS
 		addr.index := ARG(CALCULATE_INDEX_VECTOR_UPPER_INDEX DOWNTO CALCULATE_INDEX_VECTOR_LOWER_INDEX);
 		addr.offset := ARG(CALCULATE_OFFSET_VECTOR_UPPER_INDEX DOWNTO CALCULATE_OFFSET_VECTOR_LOWER_INDEX);
 		-- ---------------------------------------------------------------------
-		-- addr.index_as_integer := TO_INTEGER(UNSIGNED(addr.index));
-		-- addr.offset_as_integer := TO_INTEGER(UNSIGNED(addr.offset(4 downto 3)));
 		-- ---------------------------------------------------------------------
 		-- deal with cases that are meta value ... may cause issues ... 
-		IF NOT is_X(addr.index) THEN
+		-- IF NOT is_X(addr.index) THEN
 			addr.index_as_integer := TO_INTEGER(UNSIGNED(addr.index));
-		ELSE
-			addr.index_as_integer := 0;
-		END IF;
-		IF NOT is_X(addr.offset(CALCULATE_OFFSET_VECTOR_UPPER_INDEX DOWNTO CALCULATE_OFFSET_VECTOR_UPPER_INDEX - 1)) THEN
+		-- ELSE
+		-- 	addr.index_as_integer := 0;
+		-- END IF;
+		-- IF NOT is_X(addr.offset(CALCULATE_OFFSET_VECTOR_UPPER_INDEX DOWNTO CALCULATE_OFFSET_VECTOR_UPPER_INDEX - 1)) THEN
 			addr.offset_as_integer := TO_INTEGER(UNSIGNED(addr.offset(CALCULATE_OFFSET_VECTOR_UPPER_INDEX DOWNTO CALCULATE_OFFSET_VECTOR_UPPER_INDEX - 1)));
-		ELSE
-			addr.offset_as_integer := 0;
-		END IF;
+		-- ELSE
+		-- 	addr.offset_as_integer := 0;
+		-- END IF;
 		-- Check whether the offset integer is correct.
 		IF (addr.offset_as_integer > DEFAULT_BLOCK_SIZE - 1 OR addr.offset_as_integer < 0) THEN
 			REPORT "offset as integer is false. " & INTEGER'IMAGE(addr.offset_as_integer) SEVERITY FAILURE;

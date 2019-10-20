@@ -63,7 +63,6 @@ BEGIN
 	BEGIN
 		IF (clk'event AND rising_edge(clk)) THEN
 			-- initializing ...
-
 			IF (reset = '1') THEN
 				IF (dirty = 'U') THEN
 					dirty <= '0';
@@ -72,25 +71,15 @@ BEGIN
 					valid <= '0';
 				END IF;
 			END IF;
-
-			--		counter <= 	counter-1 when state=READ_DATA and rising_edge(clk) else
-			--					1		  when state=NOTHING;
-
 			-- Update the counter.
 			IF state = READ_DATA THEN
 				counter <= counter - 1;
 			ELSE
 				counter <= 1;
 			END IF;
-
 			-- -----------------------------------------------------------------------------
 			-- Determines the read/write mode.
 			-- -----------------------------------------------------------------------------
-			-- state <= 		READ_DATA  when wr_word='0' AND rd_word='1' AND wr_cache_block_Line='0' AND rd_cache_block_line='0' else 
-			-- 				WRITE_DATA when wr_word='1' AND rd_word='0' AND wr_cache_block_Line='0' AND rd_cache_block_line='0' else 
-			-- 				READ_LINE  when rd_word='0' and wr_word='0' AND wr_cache_block_Line='0' AND rd_cache_block_line='1' else
-			-- 				WRITE_LINE when rd_word='0' AND wr_word='0' AND wr_cache_block_Line='1' AND rd_cache_block_line='0' else 
-			-- 				NOTHING;
 			IF (wr_word = '0' AND rd_word = '1' AND wr_cache_block_Line = '0' AND rd_cache_block_line = '0') THEN
 				state <= READ_DATA;
 			ELSIF (wr_word = '1' AND rd_word = '0' AND wr_cache_block_Line = '0' AND rd_cache_block_line = '0') THEN
@@ -111,12 +100,6 @@ BEGIN
 			-- -----------------------------------------------------------------------------
 			-- Determine the valid bit.
 			-- -----------------------------------------------------------------------------
-			-- valid <= valid_bits(memoryAddress.index_as_integer) when set_valid = '0' else 
-			-- 		'Z';
-
-			-- dirty <= dirty_bits(memoryAddress.index_as_integer) when set_dirty = '0' and rd_word='1' and reset = '0' else
-			-- 		'Z' when set_dirty='1';
-
 			IF (set_valid = '0') THEN
 				valid <= valid_bits(memoryAddress.index_as_integer);
 			ELSE
@@ -131,10 +114,7 @@ BEGIN
 			-- Reset directly the valid bits and the dirty bits when to reset.
 			-- Otherwise, set the correspondent dirty bit and valid bit.
 			-- -----------------------------------------------------------------------------
-			--valid_bits <= (others=>'0') when reset='1' else
-			--			MODIFY_VECTOR(memoryAddress.index_as_integer, valid_bits, '1') when write_to_data_brams='1';
-			--dirty_bits <= (others=>'0') when reset='1' else
-			--			MODIFY_VECTOR(memoryAddress.index_as_integer, dirty_bits, dirty) when set_dirty='1';
+		
 			IF (reset = '1') THEN
 				valid_bits <= (OTHERS => '0');
 			ELSE
@@ -152,8 +132,7 @@ BEGIN
 			-- -----------------------------------------------------------------------------
 			-- Determine whether a cache block/line should be read or written.
 			-- -----------------------------------------------------------------------------
-			-- cache_memory_data_bus <= data_from_bram when state=WRITE_DATA else
-			-- 			data_from_bram when state=READ_DATA;
+		
 			IF (state = WRITE_DATA) THEN
 				cache_memory_data_bus <= data_from_bram;
 			ELSE
@@ -164,9 +143,6 @@ BEGIN
 			-- -----------------------------------------------------------------------------
 			-- Determine the new tag value to save in correspondent BRAM.
 			-- -----------------------------------------------------------------------------
-
-			-- tag_to_bram <= memoryAddress.tag when state=WRITE_DATA else 
-			--			memoryAddress.tag when state=WRITE_LINE;
 			IF (state = WRITE_DATA) THEN
 				tag_to_bram <= memoryAddress.tag;
 			ELSE
@@ -182,27 +158,16 @@ BEGIN
 			-- -----------------------------------------------------------------------------
 			-- Determine the new cache block line.
 			-- -----------------------------------------------------------------------------
-
-			-- block_line_to_bram <= SET_BLOCK_LINE( block_line_from_bram, data_cpu, memoryAddress.offset_as_integer ) when state=WRITE_DATA else
-			--				block_line_from_bram;
-
 			IF (state = WRITE_DATA) THEN
 				block_line_to_bram <= SET_BLOCK_LINE(block_line_from_bram, data_cpu, memoryAddress.offset_as_integer);
 			ELSE
 				block_line_to_bram <= block_line_from_bram;
 			END IF;
-
-			-- block_line_from_bram <= block_line_from_bram when state=READ_DATA and counter > 0 else
-			-- 					TO_CACHE_BLOCK_LINE( data_from_bram );
-
 			IF (state = READ_DATA AND counter > 0) THEN
 				block_line_from_bram <= block_line_from_bram;
 			ELSE
 				block_line_from_bram <= TO_CACHE_BLOCK_LINE(data_from_bram);
 			END IF;
-
-			-- data_to_bram <= new_cache_block_line when state=WRITE_LINE else 
-			-- 			TO_STD_LOGIC_VECTOR( block_line_to_bram ) when state=WRITE_DATA;
 			IF (state = WRITE_LINE) THEN
 				data_to_bram <= new_cache_block_line;
 			ELSE
@@ -210,11 +175,6 @@ BEGIN
 					data_to_bram <= TO_STD_LOGIC_VECTOR(block_line_to_bram);
 				END IF;
 			END IF;
-			-- data_cpu <= (others=>'0') when (state=READ_DATA and not(valid = '1' AND tags_are_equal = '1')) else
-			-- 		(others=>'Z') when (wr_rd='1' ) else
-			-- 		(others=>'0') when (state=READ_DATA and counter>0) else
-			-- 		(block_line_from_bram(memoryAddress.offset_as_integer)) when state=READ_DATA else
-			-- 		(others=>'Z');
 			IF (state = READ_DATA AND NOT(valid = '1' AND tags_are_equal = '1')) THEN
 				data_cpu <= (OTHERS => '0');
 			ELSE
@@ -236,11 +196,6 @@ BEGIN
 			-- Check whether to read or write the data BRAM.
 			-- -----------------------------------------------------------------------------
 
-			-- write_to_data_brams <= '0' when state=READ_DATA else 
-			-- 					'1' when state=WRITE_DATA else 
-			-- 					'1' when state=WRITE_LINE else
-			-- 					'0' when state=READ_LINE else 
-			-- 					'0';
 			IF (state = READ_DATA) THEN
 				write_to_data_brams <= '0';
 			ELSIF (state = READ_LINE) THEN
@@ -254,9 +209,6 @@ BEGIN
 			END IF;
 			write_to_data_bram <= write_to_data_brams;
 			write_to_tag_bram <= write_to_data_brams;
-
-			-- tags_are_equal <= '1' when tag_from_bram=memoryAddress.tag else '0';
-			-- hit 		 <= '1' when valid = '1' AND tags_are_equal = '1' else '0';
 
 			IF (tag_from_bram = memoryAddress.tag) THEN
 				tags_are_equal <= '1';

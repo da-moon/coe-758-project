@@ -65,5 +65,4 @@ ENTITY direct_mapped_cache_controller IS
 		-- TODO Remove ? 
 		new_cache_block_line : IN STD_LOGIC_VECTOR(DEFAULT_DATA_WIDTH * DEFAULT_BLOCK_SIZE - 1 DOWNTO 0)
 	);
-
 END;

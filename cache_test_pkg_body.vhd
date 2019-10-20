@@ -55,6 +55,29 @@ PACKAGE BODY cache_test_pkg IS
 		RETURN v;
 	END;
 	-- -----------------------------------------------------------------------------------------------------------	
+	FUNCTION GET_WR_RD_DEFAULTS(ARG : IN INTEGER) RETURN STD_LOGIC IS
+		VARIABLE v : STD_LOGIC;
+	BEGIN
+		if (ARG=7) then
+			v := 		'1';
+		elsif  (ARG=6) then
+			v := 		'1';
+		elsif  (ARG=5) then
+			v := 		'0';
+		elsif  (ARG=4) then
+			v := 		'0';
+		elsif  (ARG=3) then
+			v := 		'0';
+		elsif  (ARG=2) then
+			v := 		'0';
+		elsif  (ARG=1) then
+			v := 		'1';
+		else
+			v := 		'0';
+		end if;
+		RETURN v;
+	END;
+	-- -----------------------------------------------------------------------------------------------------------	
 	FUNCTION GET_TAG(ARG : IN INTEGER) RETURN STD_LOGIC_VECTOR IS
 		VARIABLE tag : STD_LOGIC_VECTOR(CALCULATE_TAG_VECTOR_SIZE - 1 DOWNTO 0) := (OTHERS => '0');
 	BEGIN
