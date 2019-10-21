@@ -1,6 +1,6 @@
 
 ARCHITECTURE behaviour OF bram IS
-  CONSTANT memTypeLength : INTEGER := 2 ** ADDR - 1;
+  CONSTANT memTypeLength : INTEGER := 2 ** addr - 1;
   TYPE MemType IS ARRAY(0 TO memTypeLength) OF STD_LOGIC_VECTOR(DATA - 1 DOWNTO 0);
   IMPURE FUNCTION InitRamFromFile (ARG : IN STRING) RETURN MemType IS
     -- FILE RamFile : text IS IN ARG;
@@ -26,48 +26,98 @@ BEGIN
     IF EDGE = RISING THEN
       CASE MODE IS
         WHEN READ_FIRST => IF rising_edge(clk) THEN
+        IF NOT is_X(mem(to_i(adr))) THEN
           do <= mem(to_i(adr));
-          IF we = '1' THEN
+        ELSE
+          do <= (OTHERS => '0');
+        END IF;
+        IF we = '1' THEN
+          IF NOT is_X(din) THEN
             mem(to_i(adr)) <= din;
+          ELSE
+            mem(to_i(adr)) <= (OTHERS => '0');
           END IF;
+        END IF;
       END IF;
       WHEN WRITE_FIRST => IF rising_edge(clk) THEN
       IF we = '1' THEN
-        mem(to_i(adr)) <= din;
-        do <= din;
+        IF NOT is_X(din) THEN
+          mem(to_i(adr)) <= din;
+          do <= din;
+        ELSE
+          mem(to_i(adr)) <= (OTHERS => '0');
+          do <= (OTHERS => '0');
+        END IF;
       ELSE
-        do <= mem(to_i(adr));
+        IF NOT is_X(mem(to_i(adr))) THEN
+          do <= mem(to_i(adr));
+        ELSE
+          do <= (OTHERS => '0');
+        END IF;
       END IF;
     END IF;
     WHEN NO_CHANGE => IF rising_edge(clk) THEN
     IF we = '1' THEN
-      mem(to_i(adr)) <= din;
+      IF NOT is_X(din) THEN
+        mem(to_i(adr)) <= din;
+      ELSE
+        mem(to_i(adr)) <= (OTHERS => '0');
+      END IF;
     ELSE
-      do <= mem(to_i(adr));
+      IF NOT is_X(mem(to_i(adr))) THEN
+        do <= mem(to_i(adr));
+      ELSE
+        do <= (OTHERS => '0');
+      END IF;
     END IF;
   END IF;
 END CASE;
 ELSE
 CASE MODE IS
   WHEN READ_FIRST => IF falling_edge(clk) THEN
-    do <= mem(to_i(adr));
+    IF NOT is_X(mem(to_i(adr))) THEN
+      do <= mem(to_i(adr));
+    ELSE
+      do <= (OTHERS => '0');
+    END IF;
     IF we = '1' THEN
-      mem(to_i(adr)) <= din;
+      IF NOT is_X(din) THEN
+        mem(to_i(adr)) <= din;
+      ELSE
+        mem(to_i(adr)) <= (OTHERS => '0');
+      END IF;
     END IF;
 END IF;
 WHEN WRITE_FIRST => IF falling_edge(clk) THEN
 IF we = '1' THEN
-  mem(to_i(adr)) <= din;
-  do <= din;
+  IF NOT is_X(din) THEN
+    mem(to_i(adr)) <= din;
+    do <= din;
+  ELSE
+    mem(to_i(adr))  <= (OTHERS => '0');
+    do <= (OTHERS => '0');
+  END IF;
 ELSE
-  do <= mem(to_i(adr));
+  IF NOT is_X(mem(to_i(adr))) THEN
+    do <= mem(to_i(adr));
+  ELSE
+    do<= (OTHERS => '0');
+  END IF;
 END IF;
 END IF;
 WHEN NO_CHANGE => IF falling_edge(clk) THEN
 IF we = '1' THEN
-  mem(to_i(adr)) <= din;
+  IF NOT is_X(din) THEN
+    mem(to_i(adr)) <= din;
+  ELSE
+    mem(to_i(adr))<= (OTHERS => '0');
+  END IF;
 ELSE
-  do <= mem(to_i(adr));
+  IF NOT is_X(mem(to_i(adr))) THEN
+    do <= mem(to_i(adr));
+  ELSE
+    do <= (OTHERS => '0');
+  END IF;
 END IF;
 END IF;
 END CASE;

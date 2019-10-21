@@ -15,7 +15,7 @@ ARCHITECTURE testbench OF bram_tb IS
   CONSTANT TEST_TIME : TIME := 2000 ns;
   CONSTANT C_FILE_NAME : STRING := "test_results/bram.txt";
   --    
-  CONSTANT ADDR : INTEGER := 8;
+  CONSTANT addr : INTEGER := 8;
   CONSTANT DATA : INTEGER := 8;
   CONSTANT EDGE : EdgeType := RISING;
   CONSTANT RamFileName : STRING := "fixtures/bram.hex";
@@ -29,7 +29,7 @@ ARCHITECTURE testbench OF bram_tb IS
   -- test component
   COMPONENT bram
     GENERIC (
-      ADDR : INTEGER;
+      addr : INTEGER;
       DATA : INTEGER;
       EDGE : EdgeType;
       MODE : MODEType := NO_CHANGE;
@@ -67,7 +67,7 @@ BEGIN
   -- unit under test instl... 
   uut : bram
   GENERIC MAP(
-    ADDR => ADDR,
+    addr => addr,
     DATA => DATA,
     EDGE => EDGE,
     RamFileName => RamFileName

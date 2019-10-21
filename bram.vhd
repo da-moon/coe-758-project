@@ -7,7 +7,7 @@ USE work.cache_pkg.ALL;
 USE work.utils_pkg.ALL;
 ENTITY bram IS
   GENERIC (
-    ADDR : INTEGER := 10;
+    addr : INTEGER := 10;
     DATA : INTEGER := 32;
     EDGE : EdgeType := RISING;
     MODE : MODEType := NO_CHANGE;
@@ -15,7 +15,7 @@ ENTITY bram IS
   );
   PORT (
     clk, we : IN STD_LOGIC;
-    adr : IN STD_LOGIC_VECTOR(ADDR - 1 DOWNTO 0);
+    adr : IN STD_LOGIC_VECTOR(addr - 1 DOWNTO 0);
     din : IN STD_LOGIC_VECTOR(DATA - 1 DOWNTO 0);
     dout : OUT STD_LOGIC_VECTOR(DATA - 1 DOWNTO 0)
   );

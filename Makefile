@@ -48,7 +48,7 @@ PACKAGES = ./utils_pkg  ./utils_pkg_body  ./cache_pkg ./cache_pkg_body ./cache_t
 MODULES?= $(filter-out  $(PACKAGES),$(patsubst %.vhd,%, $(call rwildcard,./,*.vhd)) )
 TEMP ?= 
 ANALYZE_TARGETS?=$(addsuffix .vhd, $(subst ./,,${PACKAGES}))$(SPACE) $(addsuffix .vhd, $(subst ./,,${MODULES}))$(SPACE) $(addsuffix _behaviour.vhdl, $(subst ./,,${MODULES})) 
-SKIP_TESTS=direct_mapped_cache_controller_tb cpu_gen_tb clock_gen_tb cache_files_generator_tb bram_tb
+SKIP_TESTS=sdram_controller_tb cpu_gen_tb clock_gen_tb cache_files_generator_tb   
 STOP_TEST_TIME_FLAG= --stop-time=12us
 TESTS=$(addsuffix _tb.vhdl, $(subst ./,,${MODULES}))
 ifeq ($(DOCKER_ENV),true)
@@ -111,14 +111,14 @@ analyze: clean
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -i --workdir=./ *.vhd *.vhdl" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(TESTS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -m --ieee=synopsys --std=00 --workdir=./ cache_files_generator" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r -g -O3 --ieee=synopsys --std=00 cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
+	# - @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -m --ieee=synopsys --std=00 --workdir=./ cache_files_generator" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
+	# - @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r -g -O3 --ieee=synopsys --std=00 cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
     else
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -i --workdir=./ *.vhd *.vhdl"
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS)" 
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(TESTS)"
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -m --ieee=synopsys --std=00 --workdir=./ cache_files_generator"
-	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r -g -O3 --ieee=synopsys --std=00 cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data"
+	# - @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -m --ieee=synopsys --std=00 --workdir=./ cache_files_generator"
+	# - @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r -g -O3 --ieee=synopsys --std=00 cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data"
     endif
 module : 
 	- $(CLEAR) 
