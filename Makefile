@@ -44,11 +44,11 @@ STARTUP_SCRIPT ?= $(startup)
 TB_OPTION= --assert-level=error
 ####
 FLAGS=--warn-error 
-PACKAGES = ./utils_pkg  ./utils_pkg_body  ./cache_pkg ./cache_pkg_body ./cache_test_pkg ./cache_test_pkg_body
-MODULES?= $(filter-out  $(PACKAGES),$(patsubst %.vhd,%, $(call rwildcard,./,*.vhd)) )
+PACKAGES=./utils_pkg ./cache_pkg 
+MODULES?= $(filter-out  $(PACKAGES),$(patsubst %.vhd,%, $(call rwildcard,./,*.vhd) ))
 TEMP ?= 
-ANALYZE_TARGETS?=$(addsuffix .vhd, $(subst ./,,${PACKAGES}))$(SPACE) $(addsuffix .vhd, $(subst ./,,${MODULES}))$(SPACE) $(addsuffix _behaviour.vhdl, $(subst ./,,${MODULES})) 
-SKIP_TESTS=sdram_controller_tb cpu_gen_tb clock_gen_tb cache_files_generator_tb   
+ANALYZE_TARGETS?=$(addsuffix .vhd, $(subst ./,,${PACKAGES}))$(SPACE) $(addsuffix .vhd, $(subst ./,,${MODULES}))
+SKIP_TESTS=
 STOP_TEST_TIME_FLAG= --stop-time=12us
 TESTS=$(addsuffix _tb.vhdl, $(subst ./,,${MODULES}))
 ifeq ($(DOCKER_ENV),true)
@@ -102,29 +102,24 @@ endif
 
 test: 
 	- $(CLEAR) 
-	- @echo$(SPACE)  ${PACKAGES}
+	- @echo$(SPACE) $(MODULES)
 	- @echo$(SPACE) 
 analyze: clean
 	- $(MKDIR) test_results
-	- $(MKDIR) imem
+
     ifeq ($(DOCKER_ENV),true)
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -i --workdir=./ *.vhd *.vhdl" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(TESTS)" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
-	# - @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -m --ieee=synopsys --std=00 --workdir=./ cache_files_generator" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
-	# - @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r -g -O3 --ieee=synopsys --std=00 cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
     else
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -i --workdir=./ *.vhd *.vhdl"
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(ANALYZE_TARGETS)" 
 	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -a --ieee=synopsys --std=00 $(FLAGS) $(TESTS)"
-	# - @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -m --ieee=synopsys --std=00 --workdir=./ cache_files_generator"
-	# - @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r -g -O3 --ieee=synopsys --std=00 cache_files_generator -gTag_Filename=./imem/tag -gData_Filename=./imem/data"
     endif
 module : 
 	- $(CLEAR) 
 	- $(TOUCH) $(addsuffix .vhd,$(RUN_ARGS))
 	- $(TOUCH) $(addsuffix _tb.vhdl,$(RUN_ARGS))
-	- $(TOUCH) $(addsuffix _behaviour.vhdl,$(RUN_ARGS))
 
 
 build:  analyze
@@ -152,7 +147,8 @@ clean:
     endif
 	- $(RM) work-obj93.cf *.o
 	- $(RM) test_results
-	- $(RM) imem
+
+
 MERMAID_FILES?=$(patsubst %.mmd,%,$(subst fixtures/mermaid/,, $(call rwildcard,fixtures/mermaid/,*.mmd)))
 
 mermaid:  clean
