@@ -1,0 +1,6 @@
+>/usr/local/lib/ghdl/std/v93/
+../../src/std/v93/textio.vhdl
+>/usr/local/lib/ghdl/std/v93/
+../../src/std/v93/textio-body.vhdl
+>
+sdram_controller_tb.vhdl

@@ -1,20 +1,19 @@
 LIBRARY ieee;
--- USE std.textio.ALL;
 USE ieee.std_logic_1164.ALL;
 USE ieee.numeric_std.ALL;
 USE work.utils_pkg.ALL;
 USE work.cache_pkg.ALL;
-USE std.textio.ALL;
+-- USE std.textio.ALL;
 
 ENTITY cache_controller_tb IS
 END cache_controller_tb;
 ARCHITECTURE testbench OF cache_controller_tb IS
     CONSTANT clock_period : TIME := 10 ns;
     CONSTANT TEST_TIME : TIME := 2000 ns;
-    CONSTANT C_FILE_NAME : STRING := "test_results/cache_controller.txt";
-    -- file output ...
-    SIGNAL eof : std_logic := '0';
-    FILE fptr : text;
+    -- CONSTANT C_FILE_NAME : STRING := "test_results/cache_controller.txt";
+    -- -- file output ...
+    -- SIGNAL eof : std_logic := '0';
+    -- FILE fptr : text;
     -- -----------------------------------
     SIGNAL clk : std_logic := '0';
     SIGNAL trig : STD_LOGIC := '1';
@@ -130,41 +129,41 @@ BEGIN
         sram_wen_debug => sram_wen_sig
     );
     PROCESS
-        VARIABLE L : line;
-        VARIABLE fstatus : file_open_status;
+        -- VARIABLE L : line;
+        -- VARIABLE fstatus : file_open_status;
         VARIABLE counter : INTEGER;
     BEGIN
         WAIT FOR 1 ns;
-        write(L, STRING'("testing cache controller !"));
-        writeline(output, L);
-        file_open(fstatus, fptr, C_FILE_NAME, write_mode);
+        -- write(L, STRING'("testing cache controller !"));
+        -- writeline(output, L);
+        -- file_open(fstatus, fptr, C_FILE_NAME, write_mode);
         WHILE (counter * 10 ns < TEST_TIME) LOOP
             WAIT UNTIL rising_edge(clk);
             trig <= NOT trig;
 
             REPORT "ready_sig [ " & STD_LOGIC'IMAGE(ready_sig) & " ] " & "wr_rd_sig [ " & STD_LOGIC'IMAGE(wr_rd_sig) & " ] " & "dirty_flag_sig [ " & STD_LOGIC'IMAGE(dirty_flag_sig) & " ] " & "hit_sig [ " & STD_LOGIC'IMAGE(hit_sig) & " ] " & "cpu_cs_sig [ " & STD_LOGIC'IMAGE(cpu_cs_sig) & " ] " & "valid_bit_sig [ " & STD_LOGIC'IMAGE(valid_bit_sig(to_integer(unsigned(index_sig)))) & " ] " & "cpu_dirty_bit_tracker_sig [ " & STD_LOGIC'IMAGE(dirty_bit_sig(to_integer(unsigned(index_sig)))) & " ] " & "mstrb_sig [ " & STD_LOGIC'IMAGE(mstrb_sig) & " ] " & "trig [ " & STD_LOGIC'IMAGE(trig) & " ] " SEVERITY NOTE;
-            write(L, STRING'("ready_sig [ " & STD_LOGIC'IMAGE(ready_sig) & " ] " & "wr_rd_sig [ " & STD_LOGIC'IMAGE(wr_rd_sig) & " ] " & "dirty_flag_sig [ " & STD_LOGIC'IMAGE(dirty_flag_sig) & " ] " & "hit_sig [ " & STD_LOGIC'IMAGE(hit_sig) & " ] " & "cpu_cs_sig [ " & STD_LOGIC'IMAGE(cpu_cs_sig) & " ] " & "valid_bit_sig [ " & STD_LOGIC'IMAGE(valid_bit_sig(to_integer(unsigned(index_sig)))) & " ] " & "cpu_dirty_bit_tracker_sig [ " & STD_LOGIC'IMAGE(dirty_bit_sig(to_integer(unsigned(index_sig)))) & " ] " & "mstrb_sig [ " & STD_LOGIC'IMAGE(mstrb_sig) & " ] " & "trig [ " & STD_LOGIC'IMAGE(trig) & " ] "), right, 2);
-            writeline(fptr, L);
+            -- write(L, STRING'("ready_sig [ " & STD_LOGIC'IMAGE(ready_sig) & " ] " & "wr_rd_sig [ " & STD_LOGIC'IMAGE(wr_rd_sig) & " ] " & "dirty_flag_sig [ " & STD_LOGIC'IMAGE(dirty_flag_sig) & " ] " & "hit_sig [ " & STD_LOGIC'IMAGE(hit_sig) & " ] " & "cpu_cs_sig [ " & STD_LOGIC'IMAGE(cpu_cs_sig) & " ] " & "valid_bit_sig [ " & STD_LOGIC'IMAGE(valid_bit_sig(to_integer(unsigned(index_sig)))) & " ] " & "cpu_dirty_bit_tracker_sig [ " & STD_LOGIC'IMAGE(dirty_bit_sig(to_integer(unsigned(index_sig)))) & " ] " & "mstrb_sig [ " & STD_LOGIC'IMAGE(mstrb_sig) & " ] " & "trig [ " & STD_LOGIC'IMAGE(trig) & " ] "), right, 2);
+            -- writeline(fptr, L);
             IF NOT is_X (tag_sig) THEN
                 REPORT "input address [ " & TO_STRING(addr_sig) & " ] " & "tag_sig [ " & TO_STRING(tag_sig) & " ] " & "index_sig [ " & TO_STRING(index_sig) & " ] " & "offset_sig [ " & TO_STRING(offset_sig) & " ] " SEVERITY NOTE;
-                write(L, STRING'("input address [ " & TO_STRING(addr_sig) & " ] " & "tag_sig [ " & TO_STRING(tag_sig) & " ] " & "index_sig [ " & TO_STRING(index_sig) & " ] " & "offset_sig [ " & TO_STRING(offset_sig) & " ] "), right, 2);
-                writeline(fptr, L);
+                -- write(L, STRING'("input address [ " & TO_STRING(addr_sig) & " ] " & "tag_sig [ " & TO_STRING(tag_sig) & " ] " & "index_sig [ " & TO_STRING(index_sig) & " ] " & "offset_sig [ " & TO_STRING(offset_sig) & " ] "), right, 2);
+                -- writeline(fptr, L);
             END IF;
             REPORT "cpu_dout_sig [ " & TO_STRING(cpu_dout_sig) & " ] " & "cpu_din_sig [ " & TO_STRING(cpu_din_sig) & " ] " SEVERITY NOTE;
-            write(L, STRING'("cpu_dout_sig [ " & TO_STRING(cpu_dout_sig) & " ] " & "cpu_din_sig [ " & TO_STRING(cpu_din_sig) & " ] "), right, 2);
-            writeline(fptr, L);
+            -- write(L, STRING'("cpu_dout_sig [ " & TO_STRING(cpu_dout_sig) & " ] " & "cpu_din_sig [ " & TO_STRING(cpu_din_sig) & " ] "), right, 2);
+            -- writeline(fptr, L);
             REPORT "sram_wen_sig [ " & TO_STRING(sram_wen_sig) & " ] " & "sram_addr_sig [ " & TO_STRING(sram_addr_sig) & " ] " & "sram_din_sig [ " & TO_STRING(sram_din_sig) & " ] " & "sram_dout_sig [ " & TO_STRING(sram_dout_sig) & " ] " SEVERITY NOTE;
-            write(L, STRING'("sram_wen_sig [ " & TO_STRING(sram_wen_sig) & " ] " & "sram_addr_sig [ " & TO_STRING(sram_addr_sig) & " ] " & "sram_din_sig [ " & TO_STRING(sram_din_sig) & " ] " & "sram_dout_sig [ " & TO_STRING(sram_dout_sig) & " ] "), right, 2);
-            writeline(fptr, L);
+            -- write(L, STRING'("sram_wen_sig [ " & TO_STRING(sram_wen_sig) & " ] " & "sram_addr_sig [ " & TO_STRING(sram_addr_sig) & " ] " & "sram_din_sig [ " & TO_STRING(sram_din_sig) & " ] " & "sram_dout_sig [ " & TO_STRING(sram_dout_sig) & " ] "), right, 2);
+            -- writeline(fptr, L);
             REPORT "sdram_wr_rd_sig [ " & STD_LOGIC'IMAGE(sdram_wr_rd_sig) & " ] " & "sdram_addr_sig [ " & TO_STRING(sdram_addr_sig) & " ] " & "sdram_dina_sig [ " & TO_STRING(sdram_dina_sig) & " ] " & "sdram_douta_sig [ " & TO_STRING(sdram_douta_sig) & " ] " SEVERITY NOTE;
-            write(L, STRING'("sdram_wr_rd_sig [ " & STD_LOGIC'IMAGE(sdram_wr_rd_sig) & " ] " & "sdram_addr_sig [ " & TO_STRING(sdram_addr_sig) & " ] " & "sdram_dina_sig [ " & TO_STRING(sdram_dina_sig) & " ] " & "sdram_douta_sig [ " & TO_STRING(sdram_douta_sig) & " ] "), right, 2);
-            writeline(fptr, L);
-            write(L, STRING'("---------------------------------------------------------------------------------------------"), right, 2);
-            writeline(fptr, L);
+            -- write(L, STRING'("sdram_wr_rd_sig [ " & STD_LOGIC'IMAGE(sdram_wr_rd_sig) & " ] " & "sdram_addr_sig [ " & TO_STRING(sdram_addr_sig) & " ] " & "sdram_dina_sig [ " & TO_STRING(sdram_dina_sig) & " ] " & "sdram_douta_sig [ " & TO_STRING(sdram_douta_sig) & " ] "), right, 2);
+            -- writeline(fptr, L);
+            -- write(L, STRING'("---------------------------------------------------------------------------------------------"), right, 2);
+            -- writeline(fptr, L);
         END LOOP;
 
         WAIT UNTIL rising_edge(clk);
-        file_close(fptr);
+        -- file_close(fptr);
         WAIT;
     END PROCESS;
 END testbench;

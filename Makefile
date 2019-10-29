@@ -104,7 +104,7 @@ test:
 	- $(CLEAR) 
 	- @echo$(SPACE) $(MODULES)
 	- @echo$(SPACE) 
-analyze: clean
+analyze: 
 	- $(MKDIR) test_results
 
     ifeq ($(DOCKER_ENV),true)

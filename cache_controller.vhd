@@ -34,12 +34,12 @@ ENTITY cache_controller IS
     );
 END cache_controller;
 ARCHITECTURE Behavioral OF cache_controller IS
-    -- DISK BACKED BRAM ....  COMMENT OUT WHEN BUILDING IN ISE
-    CONSTANT bram_addr_size : INTEGER := 8;
-    CONSTANT bram_data_size : INTEGER := 8;
-    CONSTANT EDGE : EdgeType := RISING;
-    CONSTANT RamFileName : STRING := "fixtures/bram.hex";
-    -- END OF BRAM CONTANTS
+    -- -- DISK BACKED BRAM ....  COMMENT OUT WHEN BUILDING IN ISE
+    -- CONSTANT bram_addr_size : INTEGER := 8;
+    -- CONSTANT bram_data_size : INTEGER := 8;
+    -- CONSTANT EDGE : EdgeType := RISING;
+    -- CONSTANT RamFileName : STRING := "fixtures/bram.hex";
+    -- -- END OF BRAM CONTANTS
     SIGNAL tag_register : CACHE_MEMORY := (OTHERS => (OTHERS => '0'));
     --bram(cache tag_register) Signals
     SIGNAL sram_addr_sig, sram_din_sig, sram_dout_sig : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
@@ -71,13 +71,13 @@ ARCHITECTURE Behavioral OF cache_controller IS
     END COMPONENT;
     COMPONENT bram
         -- TODO : COMMENT OUT THE GENERIC WHEN COMPILING IN ISE
-        GENERIC (
-            addr : INTEGER;
-            DATA : INTEGER;
-            EDGE : EdgeType;
-            MODE : MODEType := NO_CHANGE;
-            RamFileName : STRING
-        );
+        -- GENERIC (
+        --     addr : INTEGER;
+        --     DATA : INTEGER;
+        --     EDGE : EdgeType;
+        --     MODE : MODEType := NO_CHANGE;
+        --     RamFileName : STRING
+        -- );
         PORT (
             clka : IN STD_LOGIC;
             wea : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
