@@ -137,6 +137,13 @@ build:  analyze
 			$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl -r --ieee=synopsys $(FLAGS) $$target ${STOP_TEST_TIME_FLAG}"; \
 	done
     endif
+    ifeq ($(DOCKER_ENV),true)
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl --clean --workdir=./" docker_image="${GHDL_IMAGE}" container_name="ghdl_container" startup="/opt/ghdl/install_vsix.sh"   mount_point="/mnt/project"
+    else
+	- @$(MAKE) --no-print-directory -f $(THIS_FILE) shell cmd="ghdl --clean --workdir=./"
+    endif
+	- $(RM) *.o
+
 
 
 clean:

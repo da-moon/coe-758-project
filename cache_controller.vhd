@@ -23,12 +23,11 @@ ENTITY cache_controller IS
         tag : INOUT STD_LOGIC_VECTOR(7 DOWNTO 0);
         index : INOUT STD_LOGIC_VECTOR(2 DOWNTO 0);
         offset : INOUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-        -- tag_debug : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-        -- index_debug : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-        -- offset_debug : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
-        state_debug : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-        hit_debug : OUT STD_LOGIC;
-        sram_wen_debug : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
+        valid_bit : INOUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        dirty_bit : INOUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        hit_debug : INOUT STD_LOGIC;
+        state_debug : INOUT STD_LOGIC_VECTOR(3 DOWNTO 0);
+        sram_wen_debug : INOUT STD_LOGIC_VECTOR(0 DOWNTO 0)
     );
 END cache_controller;
 ARCHITECTURE Behavioral OF cache_controller IS
@@ -40,15 +39,8 @@ ARCHITECTURE Behavioral OF cache_controller IS
     -- END OF BRAM CONTANTS
     SIGNAL memory : CACHE_MEMORY := (OTHERS => (OTHERS => '0'));
     --bram(cache memory) Signals
-    SIGNAL dirty_vector : STD_LOGIC_VECTOR(7 DOWNTO 0) := "00000000";
-    SIGNAL valid_vector : STD_LOGIC_VECTOR(7 DOWNTO 0) := "00000000";
     SIGNAL sram_addr_sig, sram_din_sig, sram_dout_sig : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
     SIGNAL sram_wen : STD_LOGIC_VECTOR(0 DOWNTO 0) := (OTHERS => '0');
-    -- remove
-    -- SIGNAL sram_addr_sig_temp : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
-    -- SIGNAL sram_din_sig_temp : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
-    -- SIGNAL sram_dout_sig_temp : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
-    -- SIGNAL sram_wen_temp : STD_LOGIC_VECTOR(0 DOWNTO 0) := (OTHERS => '0');
     --SDRAM Signals
     SIGNAL sdram_dina_sig, sdram_douta_sig : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
     SIGNAL sdram_addr_sig : STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
@@ -59,7 +51,7 @@ ARCHITECTURE Behavioral OF cache_controller IS
     SIGNAL state_current : STATE := IDLE_STATE;
     -- debug signals
     SIGNAL state_debug_sig : STD_LOGIC_VECTOR(3 DOWNTO 0) := (OTHERS => '0');
-    SIGNAL hit_debug_sig : STD_LOGIC;
+    -- SIGNAL hit_debug_sig : STD_LOGIC;
     --Components
     COMPONENT sdram_controller
         PORT (
@@ -129,21 +121,26 @@ BEGIN
                 sram_wen <= "0";
                 --Evaluating a HIT/MISS
                 -- HIT
-                IF (valid_vector(to_integer(unsigned(index))) = '1' AND memory(to_integer(unsigned(index))) = tag) THEN
-                    hit_debug_sig <= '1';
+                IF (valid_bit(to_integer(unsigned(index))) = '1' AND memory(to_integer(unsigned(index))) = tag) THEN
                     IF (wr_rd = '1') THEN
+                    hit_debug <= '1';
+
                         -- writing incoming data
                         -- to cache memory (bram) because it was in hit state
-                        dirty_vector(to_integer(unsigned(index))) <= '1';
-                        valid_vector(to_integer(unsigned(index))) <= '1';
+                        dirty_bit(to_integer(unsigned(index))) <= '1';
+                        valid_bit(to_integer(unsigned(index))) <= '1';
                         sram_wen <= "1";
                         sram_din_sig <= cpu_dout;
                         douta <= (OTHERS => 'Z');
 
                     ELSE
+                    hit_debug <= '1';
                         -- returning data from cache memory (sram)
                         -- to cpu
                         douta <= sram_dout_sig;
+                        -- signal that shows this is a read state
+                        state_debug_sig <= "0100";
+
                     END IF;
                     -- making sure the state_signal is switched back to idle
                     -- after request completion
@@ -151,17 +148,17 @@ BEGIN
                     state_debug_sig <= "0000";
                 ELSE
                     --MISS
-                    hit_debug_sig <= '0';
+                    hit_debug <= '0';
                     -- dirty =1 && valid == 1 && hit == 0
                     -- write back to main memory (SDRAM)
                     -- before loading to cache memory (bram)
                     --
-                    IF (dirty_vector(to_integer(unsigned(index))) = '1' AND valid_vector(to_integer(unsigned(index))) = '1') THEN
+                    IF (dirty_bit(to_integer(unsigned(index))) = '1' AND valid_bit(to_integer(unsigned(index))) = '1') THEN
                         state_current <= WRITE_DATA_STATE;
                         state_debug_sig <= "0010";
                     ELSE
                         state_current <= READ_DATA_STATE;
-                        state_debug_sig <= "0001";
+                        state_debug_sig <= "0100";
                     END IF;
                 END IF;
 
@@ -170,16 +167,16 @@ BEGIN
                 IF (counter = 64) THEN
                     -- state_current <= HIT_STATE;
                     -- state_debug <= "0000";
-                    valid_vector(to_integer(unsigned(index))) <= '1';
+                    valid_bit(to_integer(unsigned(index))) <= '1';
                     memory(to_integer(unsigned(index))) <= tag;
                     counter <= 0;
                     sdoffset <= 0;
-                    hit_debug_sig <= '1';
+                    hit_debug <= '1';
                     IF (wr_rd = '1') THEN
                         -- writing incoming data
                         -- to cache memory (bram) because it was in hit state
-                        dirty_vector(to_integer(unsigned(index))) <= '1';
-                        valid_vector(to_integer(unsigned(index))) <= '1';
+                        dirty_bit(to_integer(unsigned(index))) <= '1';
+                        valid_bit(to_integer(unsigned(index))) <= '1';
                         sram_wen <= "1";
                         sram_din_sig <= cpu_dout;
                         douta <= (OTHERS => 'Z');
@@ -212,10 +209,10 @@ BEGIN
                 END IF;
             ELSIF (state_current = WRITE_DATA_STATE) THEN
                 IF (counter = 64) THEN
-                    dirty_vector(to_integer(unsigned(index))) <= '0';
+                    dirty_bit(to_integer(unsigned(index))) <= '0';
                     counter <= 0;
                     sdoffset <= 0;
-                    state_debug_sig <= "0001";
+                    state_debug_sig <= "0100";
                     state_current <= READ_DATA_STATE;
 
                 ELSE
@@ -237,12 +234,12 @@ BEGIN
                 ready <= '1';
                 IF (cpu_cs = '1') THEN
                     state_current <= READY_STATE;
-                    state_debug_sig <= "0100";
+                    state_debug_sig <= "0001";
                 END IF;
             END IF;
         END IF;
         state_debug <= state_debug_sig;
-        hit_debug <= hit_debug_sig;
+        -- hit_debug <= hit_debug_sig;
         sram_wen_debug <= sram_wen;
     END PROCESS;
     mstrb <= sdram_mstrb;

@@ -21,7 +21,7 @@ ENTITY bram IS
     douta : OUT STD_LOGIC_VECTOR(DATA - 1 DOWNTO 0)
   );
 END;
-ARCHITECTURE behaviour OF bram IS
+ARCHITECTURE Behavioral OF bram IS
   CONSTANT memTypeLength : INTEGER := 2 ** addr - 1;
   TYPE MemType IS ARRAY(0 TO memTypeLength) OF STD_LOGIC_VECTOR(DATA - 1 DOWNTO 0);
   IMPURE FUNCTION InitRamFromFile (ARG : IN STRING) RETURN MemType IS
@@ -147,4 +147,4 @@ END IF;
 END PROCESS;
 --do <= mem(to_i(addra));
 douta <= do;
-END behaviour;
+END Behavioral;

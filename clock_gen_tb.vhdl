@@ -16,7 +16,7 @@ architecture testbench of clock_gen_tb is
 		);
    END COMPONENT;
    for cg : clock_gen
-   use entity work.clock_gen(behaviour)
+   use entity work.clock_gen(Behavioral)
      generic map (clock_period => 10 ns);
 begin
    cg : clock_gen
