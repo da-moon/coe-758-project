@@ -2,6 +2,8 @@ LIBRARY ieee;
 USE IEEE.STD_LOGIC_1164.ALL;
 USE ieee.numeric_std.ALL;
 USE work.cache_pkg.ALL;
+USE work.utils_pkg.ALL;
+
 ENTITY cache_controller IS
     PORT (
         clk : IN STD_LOGIC;
@@ -18,31 +20,46 @@ ENTITY cache_controller IS
         sdram_douta : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
         mstrb, ready : OUT STD_LOGIC;
         --debug
-        tag_debug : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-        index_debug : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
-        offset_debug : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
+        tag : INOUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        index : INOUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+        offset : INOUT STD_LOGIC_VECTOR(4 DOWNTO 0);
+        -- tag_debug : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        -- index_debug : OUT STD_LOGIC_VECTOR(2 DOWNTO 0);
+        -- offset_debug : OUT STD_LOGIC_VECTOR(4 DOWNTO 0);
         state_debug : OUT STD_LOGIC_VECTOR(3 DOWNTO 0);
-        hit_debug : OUT STD_LOGIC
+        hit_debug : OUT STD_LOGIC;
+        sram_wen_debug : OUT STD_LOGIC_VECTOR(0 DOWNTO 0)
     );
 END cache_controller;
 ARCHITECTURE Behavioral OF cache_controller IS
-    SIGNAL memory : CACHE_MEMORY := ((OTHERS => (OTHERS => '0')));
-    SIGNAL tag : STD_LOGIC_VECTOR(7 DOWNTO 0);
-    SIGNAL index : STD_LOGIC_VECTOR(2 DOWNTO 0);
-    SIGNAL offset : STD_LOGIC_VECTOR(4 DOWNTO 0);
+    -- DISK BACKED BRAM ....  COMMENT OUT WHEN BUILDING IN ISE
+    CONSTANT bram_addr_size : INTEGER := 8;
+    CONSTANT bram_data_size : INTEGER := 8;
+    CONSTANT EDGE : EdgeType := RISING;
+    CONSTANT RamFileName : STRING := "fixtures/bram.hex";
+    -- END OF BRAM CONTANTS
+    SIGNAL memory : CACHE_MEMORY := (OTHERS => (OTHERS => '0'));
     --bram(cache memory) Signals
     SIGNAL dirty_vector : STD_LOGIC_VECTOR(7 DOWNTO 0) := "00000000";
     SIGNAL valid_vector : STD_LOGIC_VECTOR(7 DOWNTO 0) := "00000000";
-    SIGNAL sram_addr_sig, sram_din_sig, sram_dout_sig : STD_LOGIC_VECTOR(7 DOWNTO 0);
-    SIGNAL sram_wen : STD_LOGIC_VECTOR(0 DOWNTO 0);
+    SIGNAL sram_addr_sig, sram_din_sig, sram_dout_sig : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL sram_wen : STD_LOGIC_VECTOR(0 DOWNTO 0) := (OTHERS => '0');
+    -- remove
+    -- SIGNAL sram_addr_sig_temp : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
+    -- SIGNAL sram_din_sig_temp : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
+    -- SIGNAL sram_dout_sig_temp : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
+    -- SIGNAL sram_wen_temp : STD_LOGIC_VECTOR(0 DOWNTO 0) := (OTHERS => '0');
     --SDRAM Signals
-    SIGNAL sdram_dina_sig, sdram_douta_sig : STD_LOGIC_VECTOR(7 DOWNTO 0);
-    SIGNAL sdram_addr_sig : STD_LOGIC_VECTOR(15 DOWNTO 0);
+    SIGNAL sdram_dina_sig, sdram_douta_sig : STD_LOGIC_VECTOR(7 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL sdram_addr_sig : STD_LOGIC_VECTOR(15 DOWNTO 0) := (OTHERS => '0');
     SIGNAL sdram_mstrb, sdram_wr_rd : STD_LOGIC;
     SIGNAL counter : INTEGER := 0;
     SIGNAL sdoffset : INTEGER := 0;
     -- state_signal signals
-    SIGNAL state_current : STATE;
+    SIGNAL state_current : STATE := IDLE_STATE;
+    -- debug signals
+    SIGNAL state_debug_sig : STD_LOGIC_VECTOR(3 DOWNTO 0) := (OTHERS => '0');
+    SIGNAL hit_debug_sig : STD_LOGIC;
     --Components
     COMPONENT sdram_controller
         PORT (
@@ -55,6 +72,14 @@ ARCHITECTURE Behavioral OF cache_controller IS
         );
     END COMPONENT;
     COMPONENT bram
+        -- TODO : COMMENT OUT THE GENERIC WHEN COMPILING IN ISE
+        GENERIC (
+            addr : INTEGER;
+            DATA : INTEGER;
+            EDGE : EdgeType;
+            MODE : MODEType := NO_CHANGE;
+            RamFileName : STRING
+        );
         PORT (
             clka : IN STD_LOGIC;
             wea : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
@@ -74,6 +99,13 @@ BEGIN
         douta => sdram_douta_sig
     );
     bram_instl : bram
+    -- TODO : COMMENT OUT THE GENERIC WHEN COMPILING IN ISE
+    GENERIC MAP(
+        addr => bram_addr_size,
+        DATA => bram_data_size,
+        EDGE => EDGE,
+        RamFileName => RamFileName
+    )
     PORT MAP(
         clka => clk,
         wea => sram_wen,
@@ -81,25 +113,24 @@ BEGIN
         dina => sram_din_sig,
         douta => sram_dout_sig
     );
-    PROCESS (clk, cpu_cs)
+    PROCESS (
+        clk,
+        cpu_cs)
     BEGIN
         IF (clk'EVENT AND clk = '1') THEN
             --Setting the signal values
             IF (state_current = READY_STATE) THEN
                 ready <= '0';
                 tag <= GET_TAG(addr);
-                tag_debug <= tag;
                 index <= GET_INDEX(addr);
-                index_debug <= index;
                 offset <= GET_OFFSET(addr);
-                offset_debug <= offset;
                 sdram_addr_sig(15 DOWNTO 5) <= addr(15 DOWNTO 5);
                 sram_addr_sig(7 DOWNTO 0) <= addr(7 DOWNTO 0);
                 sram_wen <= "0";
                 --Evaluating a HIT/MISS
                 -- HIT
                 IF (valid_vector(to_integer(unsigned(index))) = '1' AND memory(to_integer(unsigned(index))) = tag) THEN
-                    hit_debug <= '1';
+                    hit_debug_sig <= '1';
                     IF (wr_rd = '1') THEN
                         -- writing incoming data
                         -- to cache memory (bram) because it was in hit state
@@ -117,32 +148,51 @@ BEGIN
                     -- making sure the state_signal is switched back to idle
                     -- after request completion
                     state_current <= IDLE_STATE;
-                    state_debug <= "0011";
+                    state_debug_sig <= "0000";
                 ELSE
                     --MISS
-                    hit_debug <= '0';
+                    hit_debug_sig <= '0';
                     -- dirty =1 && valid == 1 && hit == 0
                     -- write back to main memory (SDRAM)
                     -- before loading to cache memory (bram)
                     --
                     IF (dirty_vector(to_integer(unsigned(index))) = '1' AND valid_vector(to_integer(unsigned(index))) = '1') THEN
                         state_current <= WRITE_DATA_STATE;
-                        state_debug <= "0010";
+                        state_debug_sig <= "0010";
                     ELSE
                         state_current <= READ_DATA_STATE;
-                        state_debug <= "0001";
+                        state_debug_sig <= "0001";
                     END IF;
                 END IF;
 
             ELSIF (state_current = READ_DATA_STATE) THEN
                 --reading data from main memory
                 IF (counter = 64) THEN
+                    -- state_current <= HIT_STATE;
+                    -- state_debug <= "0000";
                     valid_vector(to_integer(unsigned(index))) <= '1';
                     memory(to_integer(unsigned(index))) <= tag;
                     counter <= 0;
-                    state_current <= HIT_STATE;
                     sdoffset <= 0;
-                    state_debug <= "0000";
+                    hit_debug_sig <= '1';
+                    IF (wr_rd = '1') THEN
+                        -- writing incoming data
+                        -- to cache memory (bram) because it was in hit state
+                        dirty_vector(to_integer(unsigned(index))) <= '1';
+                        valid_vector(to_integer(unsigned(index))) <= '1';
+                        sram_wen <= "1";
+                        sram_din_sig <= cpu_dout;
+                        douta <= (OTHERS => 'Z');
+
+                    ELSE
+                        -- returning data from cache memory (sram)
+                        -- to cpu
+                        douta <= sram_dout_sig;
+                    END IF;
+                    -- making sure the state_signal is switched back to idle
+                    -- after request completion
+                    state_current <= IDLE_STATE;
+                    state_debug_sig <= "0000";
                 ELSE
                     IF (counter MOD 2 = 1) THEN
                         sdram_mstrb <= '0';
@@ -165,7 +215,7 @@ BEGIN
                     dirty_vector(to_integer(unsigned(index))) <= '0';
                     counter <= 0;
                     sdoffset <= 0;
-                    state_debug <= "0001";
+                    state_debug_sig <= "0001";
                     state_current <= READ_DATA_STATE;
 
                 ELSE
@@ -187,10 +237,13 @@ BEGIN
                 ready <= '1';
                 IF (cpu_cs = '1') THEN
                     state_current <= READY_STATE;
-                    state_debug <= "0100";
+                    state_debug_sig <= "0100";
                 END IF;
             END IF;
         END IF;
+        state_debug <= state_debug_sig;
+        hit_debug <= hit_debug_sig;
+        sram_wen_debug <= sram_wen;
     END PROCESS;
     mstrb <= sdram_mstrb;
     sram_addr <= sram_addr_sig;

@@ -48,7 +48,7 @@ PACKAGES=./utils_pkg ./cache_pkg
 MODULES?= $(filter-out  $(PACKAGES),$(patsubst %.vhd,%, $(call rwildcard,./,*.vhd) ))
 TEMP ?= 
 ANALYZE_TARGETS?=$(addsuffix .vhd, $(subst ./,,${PACKAGES}))$(SPACE) $(addsuffix .vhd, $(subst ./,,${MODULES}))
-SKIP_TESTS=
+SKIP_TESTS=clock_gen_tb cache_controller_top_level_test_tb
 STOP_TEST_TIME_FLAG= --stop-time=12us
 TESTS=$(addsuffix _tb.vhdl, $(subst ./,,${MODULES}))
 ifeq ($(DOCKER_ENV),true)

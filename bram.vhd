@@ -14,10 +14,11 @@ ENTITY bram IS
     RamFileName : STRING
   );
   PORT (
-    clk, we : IN STD_LOGIC;
-    adr : IN STD_LOGIC_VECTOR(addr - 1 DOWNTO 0);
-    din : IN STD_LOGIC_VECTOR(DATA - 1 DOWNTO 0);
-    dout : OUT STD_LOGIC_VECTOR(DATA - 1 DOWNTO 0)
+    clka : IN STD_LOGIC;
+    wea : IN STD_LOGIC_VECTOR(0 DOWNTO 0);
+    addra : IN STD_LOGIC_VECTOR(addr - 1 DOWNTO 0);
+    dina : IN STD_LOGIC_VECTOR(DATA - 1 DOWNTO 0);
+    douta : OUT STD_LOGIC_VECTOR(DATA - 1 DOWNTO 0)
   );
 END;
 ARCHITECTURE behaviour OF bram IS
@@ -42,51 +43,51 @@ ARCHITECTURE behaviour OF bram IS
   SIGNAL mem : MemType := InitRamFromFile(RamFileName);
   SIGNAL do : STD_LOGIC_VECTOR(DATA - 1 DOWNTO 0) := (OTHERS => '0');
 BEGIN
-  PROCESS (clk)
+  PROCESS (clka)
   BEGIN
     IF EDGE = RISING THEN
       CASE MODE IS
-        WHEN READ_FIRST => IF rising_edge(clk) THEN
-        IF NOT is_X(mem(to_i(adr))) THEN
-          do <= mem(to_i(adr));
-        ELSE
-          do <= (OTHERS => '0');
-        END IF;
-        IF we = '1' THEN
-          IF NOT is_X(din) THEN
-            mem(to_i(adr)) <= din;
+        WHEN READ_FIRST => IF rising_edge(clka) THEN
+          IF NOT is_X(mem(to_i(addra))) THEN
+            do <= mem(to_i(addra));
           ELSE
-            mem(to_i(adr)) <= (OTHERS => '0');
+            do <= (OTHERS => '0');
           END IF;
-        END IF;
+          IF ieee.std_logic_unsigned."=" (wea, "1") THEN
+            IF NOT is_X(dina) THEN
+              mem(to_i(addra)) <= dina;
+            ELSE
+              mem(to_i(addra)) <= (OTHERS => '0');
+            END IF;
+          END IF;
       END IF;
-      WHEN WRITE_FIRST => IF rising_edge(clk) THEN
-      IF we = '1' THEN
-        IF NOT is_X(din) THEN
-          mem(to_i(adr)) <= din;
-          do <= din;
+      WHEN WRITE_FIRST => IF rising_edge(clka) THEN
+      IF ieee.std_logic_unsigned."=" (wea, "1") THEN
+        IF NOT is_X(dina) THEN
+          mem(to_i(addra)) <= dina;
+          do <= dina;
         ELSE
-          mem(to_i(adr)) <= (OTHERS => '0');
+          mem(to_i(addra)) <= (OTHERS => '0');
           do <= (OTHERS => '0');
         END IF;
       ELSE
-        IF NOT is_X(mem(to_i(adr))) THEN
-          do <= mem(to_i(adr));
+        IF NOT is_X(mem(to_i(addra))) THEN
+          do <= mem(to_i(addra));
         ELSE
           do <= (OTHERS => '0');
         END IF;
       END IF;
     END IF;
-    WHEN NO_CHANGE => IF rising_edge(clk) THEN
-    IF we = '1' THEN
-      IF NOT is_X(din) THEN
-        mem(to_i(adr)) <= din;
+    WHEN NO_CHANGE => IF rising_edge(clka) THEN
+    IF ieee.std_logic_unsigned."=" (wea, "1") THEN
+      IF NOT is_X(dina) THEN
+        mem(to_i(addra)) <= dina;
       ELSE
-        mem(to_i(adr)) <= (OTHERS => '0');
+        mem(to_i(addra)) <= (OTHERS => '0');
       END IF;
     ELSE
-      IF NOT is_X(mem(to_i(adr))) THEN
-        do <= mem(to_i(adr));
+      IF NOT is_X(mem(to_i(addra))) THEN
+        do <= mem(to_i(addra));
       ELSE
         do <= (OTHERS => '0');
       END IF;
@@ -95,47 +96,47 @@ BEGIN
 END CASE;
 ELSE
 CASE MODE IS
-  WHEN READ_FIRST => IF falling_edge(clk) THEN
-    IF NOT is_X(mem(to_i(adr))) THEN
-      do <= mem(to_i(adr));
+  WHEN READ_FIRST => IF falling_edge(clka) THEN
+    IF NOT is_X(mem(to_i(addra))) THEN
+      do <= mem(to_i(addra));
     ELSE
       do <= (OTHERS => '0');
     END IF;
-    IF we = '1' THEN
-      IF NOT is_X(din) THEN
-        mem(to_i(adr)) <= din;
+    IF ieee.std_logic_unsigned."=" (wea, "1") THEN
+      IF NOT is_X(dina) THEN
+        mem(to_i(addra)) <= dina;
       ELSE
-        mem(to_i(adr)) <= (OTHERS => '0');
+        mem(to_i(addra)) <= (OTHERS => '0');
       END IF;
     END IF;
 END IF;
-WHEN WRITE_FIRST => IF falling_edge(clk) THEN
-IF we = '1' THEN
-  IF NOT is_X(din) THEN
-    mem(to_i(adr)) <= din;
-    do <= din;
+WHEN WRITE_FIRST => IF falling_edge(clka) THEN
+IF ieee.std_logic_unsigned."=" (wea, "1") THEN
+  IF NOT is_X(dina) THEN
+    mem(to_i(addra)) <= dina;
+    do <= dina;
   ELSE
-    mem(to_i(adr))  <= (OTHERS => '0');
+    mem(to_i(addra)) <= (OTHERS => '0');
     do <= (OTHERS => '0');
   END IF;
 ELSE
-  IF NOT is_X(mem(to_i(adr))) THEN
-    do <= mem(to_i(adr));
+  IF NOT is_X(mem(to_i(addra))) THEN
+    do <= mem(to_i(addra));
   ELSE
-    do<= (OTHERS => '0');
+    do <= (OTHERS => '0');
   END IF;
 END IF;
 END IF;
-WHEN NO_CHANGE => IF falling_edge(clk) THEN
-IF we = '1' THEN
-  IF NOT is_X(din) THEN
-    mem(to_i(adr)) <= din;
+WHEN NO_CHANGE => IF falling_edge(clka) THEN
+IF ieee.std_logic_unsigned."=" (wea, "0") THEN
+  IF NOT is_X(dina) THEN
+    mem(to_i(addra)) <= dina;
   ELSE
-    mem(to_i(adr))<= (OTHERS => '0');
+    mem(to_i(addra)) <= (OTHERS => '0');
   END IF;
 ELSE
-  IF NOT is_X(mem(to_i(adr))) THEN
-    do <= mem(to_i(adr));
+  IF NOT is_X(mem(to_i(addra))) THEN
+    do <= mem(to_i(addra));
   ELSE
     do <= (OTHERS => '0');
   END IF;
@@ -144,6 +145,6 @@ END IF;
 END CASE;
 END IF;
 END PROCESS;
---do <= mem(to_i(adr));
-dout <= do;
+--do <= mem(to_i(addra));
+douta <= do;
 END behaviour;

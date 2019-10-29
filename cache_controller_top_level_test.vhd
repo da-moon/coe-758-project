@@ -1,8 +1,8 @@
--- LIBRARY IEEE;
--- USE IEEE.STD_LOGIC_1164.ALL;
--- ENTITY cache_controller_top_level_test IS
---     PORT (clk : IN STD_LOGIC);
--- END cache_controller_top_level_test;
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+ENTITY cache_controller_top_level_test IS
+    PORT (clk : IN STD_LOGIC);
+END cache_controller_top_level_test;
 -- ARCHITECTURE Behavioral OF cache_controller_top_level_test IS
 --     -- signals ...
 --     SIGNAL trig : STD_LOGIC;
