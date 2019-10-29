@@ -133,8 +133,8 @@ BEGIN
     );
     --	 trig <= async_out_sig(0);
     --  trig0_sig(0) <= async_out_sig(0);
-    trig <= 1;
-    trig0_sig(0) <= 1;
+    trig <= '1';
+    trig0_sig(0) <= '1';
     ila_data_sig(0) <= wr_rd_sig;
     ila_data_sig(1) <= ready_sig;
     ila_data_sig(2) <= mstrb_sig;
